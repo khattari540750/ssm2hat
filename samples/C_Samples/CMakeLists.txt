@@ -8,10 +8,10 @@
 
 # set include directory
 include_directories(${PROJECT_SOURCE_DIR}/include)
+link_directories(${PROJECT_SOURCE_DIR}/src)
 
 
 # set library and comple options 
-#set(SSM_LIBS ${SSM_LIBS} ssm)
 set(CMAKE_C_FLAGS "-Wall")
 set(CMAKE_CXX_FLAGS "-Wall")
 
@@ -20,31 +20,31 @@ set(CMAKE_CXX_FLAGS "-Wall")
 set(EXECUTABLE_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/samples/C_Samples)
 
 
-# build SensorAHandler
-add_executable(SensorAHandler SensorAHandler.c)
-target_link_libraries(SensorAHandler ${SSM_LIBS} m)
+# build sensorA_handler
+add_executable(sensorA_handler SensorAHandler.c)
+target_link_libraries(sensorA_handler ssm m)
 
 
-# build SensorAContinualRead
-add_executable(SensorAContinualRead SensorAContinualRead.c)
-target_link_libraries(SensorAContinualRead ${SSM_LIBS} m)
+# build sensorA_continual_read
+add_executable(sensorA_continual_read SensorAContinualRead.c)
+target_link_libraries(sensorA_continual_read ssm m)
 
 
-# build SensorAIntervalRead
-add_executable(SensorAIntervalRead SensorAIntervalRead.c)
-target_link_libraries(SensorAIntervalRead ${SSM_LIBS} m)
+# build sensorA_interval_read
+add_executable(sensorA_interval_read SensorAIntervalRead.c)
+target_link_libraries(sensorA_interval_read ssm m)
 
 
-# build SensorAPastRead
-add_executable(SensorAPastRead SensorAPastRead.c)
-target_link_libraries(SensorAPastRead ${SSM_LIBS} m)
+# build sensorA_past_read
+add_executable(sensorA_past_read SensorAPastRead.c)
+target_link_libraries(sensorA_past_read ssm m)
 
 
-# build SensorBHandler
-add_executable(SensorBHandler SensorBHandler.c)
-target_link_libraries(SensorBHandler ${SSM_LIBS} m)
+# build sensorB_handler
+add_executable(sensorB_handler SensorBHandler.c)
+target_link_libraries(sensorB_handler ssm m)
 
 
-# build SensorABSync
-add_executable(SensorABSync SensorABSync.c)
-target_link_libraries(SensorABSync ${SSM_LIBS} m)
+# build sensorAB_sync
+add_executable(sensorAB_sync SensorABSync.c)
+target_link_libraries(sensorAB_sync ssm m)

@@ -4,6 +4,14 @@
 config.h
 config.h.in
 src/ssm-coordinator
+samples/C_Samples/sensorAB_sync
+samples/C_Samples/sensorA_continual_read
+samples/C_Samples/sensorA_handler
+samples/C_Samples/sensorA_interval_read
+samples/C_Samples/SensorA_past_read
+samples/C_Samples/SensorB_handler
+samples/Cpp_Samples/ssm_read_sample
+samples/Cpp_Samples/ssm_write_sample
 CMakeLists.txt.user
 
 
