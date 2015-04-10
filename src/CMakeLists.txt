@@ -11,8 +11,8 @@ include_directories(${PROJECT_SOURCE_DIR}/include)
 
 
 # set ALL COMPLE OPTIONS 
-set(CMAKE_C_FLAGS "-Wall -Werror")
-set(CMAKE_CXX_FLAGS "-Wall -Werror")
+set(CMAKE_C_FLAGS "-Wall")
+set(CMAKE_CXX_FLAGS "-Wall")
 #set(CMAKE_C_FLAGS "-Werror")
 #set(CMAKE_CXX_FLAGS "-Werror")
 
