@@ -20,11 +20,27 @@ set(CMAKE_CXX_FLAGS "-Wall")
 set(EXECUTABLE_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/utilities)
 
 
-# install ssm-advance-player killssm psssm topssm
-#ssm-advance-player
-#killssm
-#psssm
-#topssm
+# install ssm-advance-player script
+install(FILES ssm-advance-player DESTINATION bin 
+        PERMISSIONS OWNER_READ OWNER_WRITE OWNER_EXECUTE 
+        GROUP_READ GROUP_EXECUTE WORLD_READ WORLD_EXECUTE)
+
+
+# install killssm script
+install(FILES killssm DESTINATION bin 
+        PERMISSIONS OWNER_READ OWNER_WRITE OWNER_EXECUTE 
+        GROUP_READ GROUP_EXECUTE WORLD_READ WORLD_EXECUTE)
+
+# install psssm script
+install(FILES psssm DESTINATION bin 
+        PERMISSIONS OWNER_READ OWNER_WRITE OWNER_EXECUTE 
+        GROUP_READ GROUP_EXECUTE WORLD_READ WORLD_EXECUTE)
+
+
+# install topssm script
+install(FILES topssm DESTINATION bin 
+        PERMISSIONS OWNER_READ OWNER_WRITE OWNER_EXECUTE 
+        GROUP_READ GROUP_EXECUTE WORLD_READ WORLD_EXECUTE)
 
 
 # build and install lsssm
