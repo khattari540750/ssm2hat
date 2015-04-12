@@ -26,7 +26,7 @@
 
 #include "ssm.h"
 #include "libssm.h"
-#include "ssm-coordinator.h"
+#include "ssm_coordinator.h"
 
 #ifdef HAVE_CONFIG_H
 #include <config.h>
