@@ -1,3 +1,11 @@
+/****************************************************************/
+/**
+  @file   ssm2hat.h
+  @brief  Library for SSM
+  @author HATTORI Kohei <hattori[at]team-lab.com>
+ */
+/****************************************************************/
+
 /**
  * @file ssm.hpp
  * @brief SSMを簡単に扱うためのクラス

@@ -1,8 +1,12 @@
+/****************************************************************/
 /**
- * ssm-coordinator.cpp - 共有メモリ・管理プログラム
- *
- * c から cppに変更。汚くなってしまったのでそのうち書き直す
+  @file   ssm_coodinator.c
+  @brief  shared memory program
+  @author HATTORI Kohei <hattori[at]team-lab.com>
  */
+/****************************************************************/
+
+
 
 #include <sys/types.h>
 #include <sys/ipc.h>
@@ -30,12 +34,15 @@
 
 using namespace std;
 
+
+
+
 //----------------------------------------------
+
 class Node
 {
 public:
-    Node( int node )
-    {
+    Node( int node ){
         this->node = node;
     }
     int node;
@@ -44,8 +51,7 @@ public:
 class Edge
 {
 public:
-    Edge( const char *name, int id, int node1, int node2, int dir )
-    {
+    Edge( const char *name, int id, int node1, int node2, int dir ){
         strncpy( this->name, name, SSM_SNAME_MAX );
         this->id = id;
         this->node1 = node1;
@@ -75,13 +81,21 @@ nodeArrayT node;								/** ノード（プロセス） */
 edgeArrayT edge;								/** エッジ保存用 */
 //----------------------------------------------
 int emergencyCnt = 0;
+
+
+
+/*--------------------------------------------------------------*/
+/**
+ * @fn
+ * @brief emergency
+ * @param sig
+ */
+/*--------------------------------------------------------------*/
 static void emergency( int sig )
 {
-    if( emergencyCnt < 1 )
-    {
+    if( emergencyCnt < 1 ){
         emergencyCnt++;
-        if( node.size( ) > 0 )
-        {
+        if( node.size( ) > 0 ){
             fprintf( stderr, "maybe other process using ssm is alive.\n");
             fprintf( stderr, "or do you forget to call 'endSSM()' at the end of programs ?\n");
             fprintf( stderr, "if you want to shutoff 'ssm-coordinator', please hit Ctrl-C.");
@@ -89,24 +103,33 @@ static void emergency( int sig )
         }
     }
 
-    if( verbosity_mode >= 1 )
-    {
+    if( verbosity_mode >= 1 ){
         fprintf( stderr, "program stop [%d]\n", sig );
         fprintf( stderr, "finalize...\n" );
     }
 
-    /* 終了処理 */
+    //! final
     free_ssm_list( ssm_top );
     ssm_top = 0;
     msgctl( msq_id, IPC_RMID, NULL );			/* メッセージキューの削除 */
     destroytimeSSM(  );							/* 時刻同期用バッファの削除 */
-    if( verbosity_mode >= 1 )
+    if( verbosity_mode >= 1 ){
         fprintf( stderr, "- all allocated shared memory released\n" );
+    }
 
-    if( verbosity_mode >= 1 )
+    if( verbosity_mode >= 1 ){
         fprintf( stderr, "exit\n" );
+    }
 }
 
+
+
+/*--------------------------------------------------------------*/
+/**
+ * @fn
+ * @brief escape_road
+ */
+/*--------------------------------------------------------------*/
 void escape_road( void )
 {
 #if 0
@@ -115,8 +138,7 @@ void escape_road( void )
     sa_sigint.sa_flags = SA_RESETHAND | SA_NODEFER;
     sa_sigint.sa_restorer = 0;
 
-    if( sigaction( SIGINT, &sa_sigint, NULL ) < 0 )
-    {
+    if( sigaction( SIGINT, &sa_sigint, NULL ) < 0 ){
         perror( "sigaction" );
         exit( 1 );
     }
@@ -125,10 +147,18 @@ void escape_road( void )
 #endif
 }
 
+
+
+/*--------------------------------------------------------------*/
+/**
+ * @fn
+ * @brief print_list
+ * @param p
+ */
+/*--------------------------------------------------------------*/
 void print_list( SSM_List * p )
 {
-    while( p )
-    {
+    while( p ){
         printf( "   |   :name : %s\n", p->name );
         printf( "   |   :ID: %d  offset: %d  size: %d  address: %ld \n   |\n", p->shm_id, p->shm_offset, p->size,
                 ( long )p->shm_ptr );
@@ -136,77 +166,102 @@ void print_list( SSM_List * p )
     }
 }
 
-/* 宛先作成 */
+
+
+/*--------------------------------------------------------------*/
+/**
+ * @fn
+ * @brief get_receive_id
+ * @return
+ */
+/*--------------------------------------------------------------*/
 long get_receive_id( void )
 {
     static long id;
-    if( id < MSQ_RES )
-        id = MSQ_RES;
+    if( id < MSQ_RES ) { id = MSQ_RES; }
 
     id++;
-    if( id > MSQ_RES_MAX )
-        id = MSQ_RES;
+
+    if( id > MSQ_RES_MAX ) { id = MSQ_RES; }
     return id;
 }
 
-/* データサイズ ssize,履歴数hsizeの共有メモリの領域を得る */
-/* 現在は単に要求毎に共有メモリ領域を確保するのみ */
-/* 将来的にはメモリ管理と似たような機構を入れる？ */
+
+
+/*--------------------------------------------------------------*/
+/**
+ * @fn
+ * @brief alloc_ssm_block
+ * @param ssize
+ * @param hsize
+ * @param cycle
+ * @param shm_h
+ * @param offset
+ * @return
+ */
+/*--------------------------------------------------------------*/
 int alloc_ssm_block( int ssize, int hsize, ssmTimeT cycle, char **shm_h, int *offset )
 {
     int s_id;
 
-    /* 共有メモリ領域をゲット */
+    //! get shared memory
     if( ( s_id =
           shmget( SHM_KEY + shm_key_num, sizeof ( ssm_header ) + ( ssize + sizeof ( ssmTimeT ) ) * hsize,
-                  IPC_CREAT | 0666 ) ) < 0 )
-    {
-        if( verbosity_mode >= 0 )
+                  IPC_CREAT | 0666 ) ) < 0 ){
+        if( verbosity_mode >= 0 ){
             fprintf( stderr, "ERROR  : cannot allock shared memory.\n" );
+        }
         return 0;
     }
     shm_key_num++;
 
-    /* あたっち */
-    if( ( *shm_h = static_cast< char* >( shmat( s_id, 0, 0 ) ) ) == ( void * )-1 )
-    {
-        return 0;
-    }
+    //! atache
+    if( ( *shm_h = static_cast< char* >( shmat( s_id, 0, 0 ) ) ) == ( void * )-1 ) { return 0; }
 #if 0
-    /* ０で初期化？ */
-    for ( i = 0; i < ( int )( sizeof ( ssm_header ) + ( ssize + sizeof ( ssmTimeT ) ) * hsize ); i++ )
+    //! 0:init?
+    for ( i = 0; i < ( int )( sizeof ( ssm_header ) + ( ssize + sizeof ( ssmTimeT ) ) * hsize ); i++ ){
         ( *shm_h )[i] = 0;
+    }
 #endif
 
-    /* 現状では新たに得た領域なので、offsetは０ */
+    //! offset 0
     *offset = 0;
-    if( cycle <= 0 )
-        cycle = 1;
+    if( cycle <= 0 ) { cycle = 1; }
 
-    /* ssm_header 初期化 */
+    //! ssm_header initialize
     shm_init_header( ( ssm_header * ) * shm_h, ssize, hsize, cycle );
 
     return s_id;
 }
 
+
+
+/*--------------------------------------------------------------*/
 /**
- * @brief 管理用リストを最後尾に作る
- * @retval 失敗したら 0 を返す
+ * @fn
+ * @brief add_ssm_list
+ * @param node
+ * @param name
+ * @param suid
+ * @param ssize
+ * @param hsize
+ * @param cycle
+ * @return 0:false
  */
+/*--------------------------------------------------------------*/
 SSM_List *add_ssm_list( int node, char *name, int suid, int ssize, int hsize, ssmTimeT cycle )
 {
     SSM_List *p, *q;
 
     p = ( SSM_List * ) malloc( sizeof ( SSM_List ) );
-    if( !p )
-    {
-        if( verbosity_mode >= 0 )
+    if( !p ){
+        if( verbosity_mode >= 0 ){
             fprintf( stderr, "ERROR  : cannot allock memory of local list\n" );
+        }
         return 0;
     }
     p->shm_id = alloc_ssm_block( ssize, hsize, cycle, &( p->shm_ptr ), &( p->shm_offset ) );
-    if( !p->shm_id )
-        return 0;
+    if( !p->shm_id ) { return 0; }
 
     p->node = node;
     strcpy( p->name, name );
@@ -216,65 +271,68 @@ SSM_List *add_ssm_list( int node, char *name, int suid, int ssize, int hsize, ss
     p->next = 0;
     p->property = 0;
     p->property_size = 0;
-    /* リストの最後にpを追加 */
-    if( !ssm_top )
-    {
-        ssm_top = p;
-    }
-    else
-    {
+
+    //! add list final p
+    if( !ssm_top ) { ssm_top = p; }
+    else{
         q = ssm_top;
-        while( q->next )
-        {
-            q = q->next;
-        }
+        while( q->next ){ q = q->next; }
         q->next = p;
     }
     return p;
 }
 
+
+
+/*--------------------------------------------------------------*/
+/**
+ * @fn
+ * @brief free_ssm_list
+ * @param ssmp
+ */
+/*--------------------------------------------------------------*/
 void free_ssm_list( SSM_List * ssmp )
 {
-    if( ssmp )
-    {
-        if( ssmp->next )
-            free_ssm_list( ssmp->next );
-        if( ssmp->shm_ptr )
-        {
-            shm_dest_header( ssmp->header );	/* 解放 */
-            shmdt( ssmp->shm_ptr );				/* デタッチ */
-            shmctl( ssmp->shm_id, IPC_RMID, 0 );	/* 削除 */
-            if( verbosity_mode >= 1 )
+    if( ssmp ){
+        if( ssmp->next ) { free_ssm_list( ssmp->next ); }
+        if( ssmp->shm_ptr ) {
+            shm_dest_header( ssmp->header );	  //! release
+            shmdt( ssmp->shm_ptr );				  //! detauch
+            shmctl( ssmp->shm_id, IPC_RMID, 0 );  //! delete
+            if( verbosity_mode >= 1 ){
                 printf( "%s detached\n", ssmp->name );
+            }
         }
 #if 0
         ssmp->next = 0;
-        if( ssmp->header )
-            free( ssmp->header );
-        if( ssmp->property )
-            free( ssmp->property );
+        if( ssmp->header ) { free( ssmp->header ); }
+        if( ssmp->property ) { free( ssmp->property ); }
         free( ssmp );
 #endif
     }
 }
 
-/* SSMの初期化 */
+
+
+/*--------------------------------------------------------------*/
+/**
+ * @fn
+ * @brief ssm_init
+ * @return
+ */
+/*--------------------------------------------------------------*/
 int ssm_init( void )
 {
-    if( is_check_msgque )
-    {
+    if( is_check_msgque ){
         msq_id = msgget( MSQ_KEY, IPC_CREAT | IPC_EXCL | 0666 );
     }
-    else
-    {
+    else{
         msq_id = msgget( MSQ_KEY, IPC_CREAT | 0666 );
     }
 
-    /* メッセージキューのオープン */
-    if( msq_id < 0 )
-    {
-        if( errno == EEXIST )
-        {
+    //! message que open
+    if( msq_id < 0 ){
+        if( errno == EEXIST ){
             fprintf( stderr, "ERROR : SSM message queue is already exist.\n" );
             fprintf( stderr, "maybe ssm-coordinator has started.\n" );
             fprintf( stderr,
@@ -286,14 +344,10 @@ int ssm_init( void )
     my_pid = getpid(  );
     ssm_top = 0;
 
-    if( !opentimeSSM(  ) )
-    {
-        return -1;
-    }
+    if( !opentimeSSM(  ) ) { return -1; }
     inittimeSSM(  );
 
-    if( verbosity_mode >= 1 )
-    {
+    if( verbosity_mode >= 1 ){
         printf( "Message queue ready.\n" );
         printf( "Msg queue ID = %d \n", msq_id );
         // printf("PID = %d\n",my_pid);
@@ -301,8 +355,16 @@ int ssm_init( void )
     return 1;
 }
 
-/* 名前か、固有IDからセンサを検索する */
-/* 名前優先で、同じ名前の物があれば固有IDから判断 */
+
+
+/*--------------------------------------------------------------*/
+/**
+ * @brief search_SSM_List
+ * @param name
+ * @param suid
+ * @return
+ */
+/*--------------------------------------------------------------*/
 SSM_List *search_SSM_List( char *name, int suid )
 {
     SSM_List *p, *pn, *pni, *pi;
@@ -312,35 +374,38 @@ SSM_List *search_SSM_List( char *name, int suid )
     pn = 0;
     pni = 0;
     pi = 0;
-    while( p )
-    {
-        if( strcmp( p->name, name ) == 0 )
-        {
-            /* 名前が同じ */
+    while( p ){
+        if( strcmp( p->name, name ) == 0 ) {
+            //! same name
             pn = p;
-            if( p->suid == suid )
-            {
-                /* 名前も同じ */
+            if( p->suid == suid ){
+                //! same name
                 pni = p;
             }
         }
-        if( p->suid == suid )
-        {
-            /* suid が同じ */
+        if( p->suid == suid ){
+            //! same suid
             pi = p;
             // break;
         }
         p = p->next;
     }
 
-    if( pni )
-        return pni;								/* 名前とIDが一致 */
-    // if(pn)return pn; /*名前が一致*/
-    // if(pi)return pi; /*IDが一致*/
+    if( pni ) { return pni; }		//! same name and ID
+    // if(pn)return pn; // same name
+    // if(pi)return pi; // same ID
     return 0;
 }
 
-/* センサリストに登録されている数を取得する */
+
+
+/*--------------------------------------------------------------*/
+/**
+ * @fn
+ * @brief get_num_SSM_List
+ * @return
+ */
+/*--------------------------------------------------------------*/
 int get_num_SSM_List( void )
 {
     SSM_List *p;
@@ -348,8 +413,7 @@ int get_num_SSM_List( void )
 
     p = ssm_top;
     num = 0;
-    while( p )
-    {
+    while( p ){
         num++;
         p = p->next;
     }
@@ -357,17 +421,23 @@ int get_num_SSM_List( void )
     return num;
 }
 
-/* センサリストからn番めのセンサのアドレスを取得する */
+
+
+/*--------------------------------------------------------------*/
+/**
+ * @brief get_nth_SSM_List
+ * @param n
+ * @return
+ */
+/*--------------------------------------------------------------*/
 SSM_List *get_nth_SSM_List( int n )
 {
     SSM_List *p;
     p = ssm_top;
 
-    while( p )
-    {
+    while( p ){
         n--;
-        if( n < 0 )
-            return p;
+        if( n < 0 ) { return p; }
         p = p->next;
     }
 
@@ -375,38 +445,41 @@ SSM_List *get_nth_SSM_List( int n )
     return p;
 }
 
-/* メッセージのやりとり */
+
+
+/*--------------------------------------------------------------*/
+/**
+ * @brief msq_loop
+ * @return
+ */
+/*--------------------------------------------------------------*/
 int msq_loop( void )
 {
     ssm_msg msg;
     SSM_List *slist;
     int len, num;
 
-    while( 1 )
-    {
-        /* 受信（待ち） */
-        if( verbosity_mode >= 2 )
-            printf( "msg_ready\n" );
+    //! loop
+    while( 1 ) {
+        //! recieve (wait)
+        if( verbosity_mode >= 2 ) { printf( "msg_ready\n" ); }
         len = msgrcv( msq_id, &msg, SSM_MSG_SIZE, MSQ_CMD, 0 );
-        if( len < 0 )
-        {
-            if(errno == EINTR)
-                continue;
+        if( len < 0 ){
+            if(errno == EINTR) { continue; }
             //perror( "ERROR : cannot get msg " );
             return 0;
         }
-        if( verbosity_mode >= 2 )
-            printf( "msg_get\n" );
-        /* それぞれのコマンドへの応答 */
+
+        if( verbosity_mode >= 2 ) { printf( "msg_get\n" ); }
+
+        // answer command
         switch ( ( msg.cmd_type ) & 0x1f )
         {
         case MC_NULL:
-            if( verbosity_mode >= 2 )
-                printf( "message:null\n" );
+            if( verbosity_mode >= 2 ) { printf( "message:null\n" ); }
             break;
         case MC_INITIALIZE:
-            if( verbosity_mode >= 2 )
-            {
+            if( verbosity_mode >= 2 ){
                 printf( "message:initialize\n" );
                 printf( "   |   :process %d attach\n", msg.res_type );
             }
@@ -414,73 +487,63 @@ int msq_loop( void )
             node.push_back( Node( msg.res_type ) );
             break;
         case MC_TERMINATE:
-            if( verbosity_mode >= 2 )
-            {
+            if( verbosity_mode >= 2 ){
                 printf( "message:terminate\n" );
                 printf( "   |   :process %d detach\n", msg.res_type );
             }
             /* プロセスをSSMから削除 */
-            {
-                nodeArrayT::iterator it = node.begin();
-                while( it != node.end(  ) )
-                {
-                    if( it->node == msg.res_type )
-                        it = node.erase( it );
-                    else
-                        it++;
+        {
+            nodeArrayT::iterator it = node.begin();
+            while( it != node.end(  ) ){
+                if( it->node == msg.res_type ){
+                    it = node.erase( it );
                 }
-
-                edgeArrayT::iterator jt = edge.begin();
-                while( jt != edge.end(  ) )
-                {
-                    if( jt->node1 == msg.res_type || jt->node2 == msg.res_type )
-                        jt = edge.erase( jt );
-                    else
-                        jt++;
-                }
+                else { it++; }
             }
+
+            edgeArrayT::iterator jt = edge.begin();
+            while( jt != edge.end(  ) )
+            {
+                if( jt->node1 == msg.res_type || jt->node2 == msg.res_type ){
+                    jt = edge.erase( jt );
+                }
+                else{ jt++; }
+            }
+        }
             break;
 
         case MC_VERSION_GET:
-            if( verbosity_mode >= 2 )
-                printf( "message:get version\n" );
+            if( verbosity_mode >= 2 ) { printf( "message:get version\n" ); }
             break;
 
-        case MC_CREATE:						/* センサのメモリ確保 */
-            if( verbosity_mode >= 2 )
-            {
+        case MC_CREATE:						//! keep memory
+            if( verbosity_mode >= 2 ){
                 printf( "message:create!\n" );
                 printf( "   |   :name=%s id=%d\n", msg.name, msg.suid );
             }
 
-            /* リストの検索 */
+            //! search list
             slist = search_SSM_List( msg.name, msg.suid );
 
             /* 同じ物が無かったら */
-            if( !slist )
-            {
-                if( verbosity_mode >= 2 )
-                    printf( "   |   :add\n" );
+            if( !slist ){
+                if( verbosity_mode >= 2 ) { printf( "   |   :add\n" ); }
                 /* リストに追加 */
                 slist = add_ssm_list( msg.res_type, msg.name, msg.suid, msg.ssize, msg.hsize, msg.time );
                 if( !slist && verbosity_mode >= 2 )
                     printf( "   |   :cannot alock\n" );
             }
-            else
-            {
-                if( verbosity_mode >= 2 )
-                    printf( "   |   :exist\n" );
+            else{
+                if( verbosity_mode >= 2 ) { printf( "   |   :exist\n" ); }
             }
             msg.msg_type = msg.res_type;		/* 返信 */
             msg.cmd_type = MC_RES;
 
-            if( slist )
-            {
+            if( slist ){
                 msg.suid = slist->shm_id;
                 msg.ssize = slist->shm_offset;
             }
-            else
-            {
+            else{
                 msg.suid = 0;
                 msg.ssize = 0;
             }
@@ -493,14 +556,12 @@ int msq_loop( void )
             break;
 
         case MC_OPEN:							/* センサのオープン */
-            if( verbosity_mode >= 2 )
-            {
+            if( verbosity_mode >= 2 ){
                 printf( "message:open!\n" );
                 printf( "   |   :name=%s id=%d\n", msg.name, msg.suid );
             }
             slist = search_SSM_List( msg.name, msg.suid );
-            if( slist )
-            {
+            if( slist ){
                 if( verbosity_mode >= 2 )
                     printf( "   |   :exist\n" );
                 /* エッジ情報の登録 */
@@ -573,7 +634,7 @@ int msq_loop( void )
                 msg.msg_type = msg.res_type;	/* 返信 */
                 msg.cmd_type = MC_RES;
                 msg.suid = slist->suid;
-                 /*ID*/ msg.ssize = slist->header->size;	/* データサイズ */
+                /*ID*/ msg.ssize = slist->header->size;	/* データサイズ */
                 // msg.hsize = slist->table_size; /*記憶数*/
                 // msg.time = slist->cycle; /*平均周期*/
                 strcpy( msg.name, slist->name );	/* 名前 */
@@ -746,21 +807,21 @@ int msq_loop( void )
         case MC_NODE_LIST_INFO:
             if( verbosity_mode >= 2 )
                 printf( "message:get node list info\n" );
+        {
+            num = 0;
+            nodeArrayT::iterator it = node.begin(  );
+            while( it != node.end(  ) )
             {
-                num = 0;
-                nodeArrayT::iterator it = node.begin(  );
-                while( it != node.end(  ) )
-                {
-                    if( num == msg.suid )
-                        break;
-                    num++;
-                    it++;
-                }
-                if( num < node.size(  ) )
-                    msg.suid = it->node;		/* 成功 */
-                else
-                    msg.suid = -1;				/* 失敗 */
+                if( num == msg.suid )
+                    break;
+                num++;
+                it++;
             }
+            if( num < node.size(  ) )
+                msg.suid = it->node;		/* 成功 */
+            else
+                msg.suid = -1;				/* 失敗 */
+        }
             msg.msg_type = msg.res_type;		/* 返信 */
             msg.cmd_type = MC_RES;
             /* 送信 */
@@ -782,50 +843,54 @@ int msq_loop( void )
                 printf( "   |   :node num %d\n", msg.suid );
             break;
         case MC_EDGE_LIST_INFO:
-            {
-                ssm_msg_edge msge;
-                if( verbosity_mode >= 2 )
-                    printf( "message:get edge list info\n" );
-                num = 0;
-                edgeArrayT::iterator it = edge.begin(  );
-                while( it != edge.end(  ) )
-                {
-                    if( num == msg.suid )
-                    {
-                        break;
-                    }
-                    num++;
-                    it++;
-                }
-                if( num < edge.size(  ) )
-                {
-                    strncpy( msge.name, it->name, SSM_SNAME_MAX );				/* 成功 */
-                    msge.suid = it->id;
-                    msge.cmd_type = MC_RES | it->dir;
-                    msge.node1 = it->node1;
-                    msge.node2 = it->node2;
-                }
-                else
-                {
-                    msge.name[0] = '\0';				/* 失敗 */
-                    msge.cmd_type = MC_RES;
-                }
-                msge.msg_type = msg.res_type;		/* 返信 */
-                /* 送信 */
-                if( ( msgsnd( msq_id, &msge, sizeof(ssm_msg_edge) - sizeof(long), 0 ) ) < 0 )
-                    return 0;
+        {
+            ssm_msg_edge msge;
+            if( verbosity_mode >= 2 ) {
+                printf( "message:get edge list info\n" );
             }
+            num = 0;
+            edgeArrayT::iterator it = edge.begin(  );
+            while( it != edge.end(  ) ){
+                if( num == msg.suid ) { break; }
+                num++;
+                it++;
+            }
+            if( num < edge.size(  ) ) {
+                strncpy( msge.name, it->name, SSM_SNAME_MAX );				/* 成功 */
+                msge.suid = it->id;
+                msge.cmd_type = MC_RES | it->dir;
+                msge.node1 = it->node1;
+                msge.node2 = it->node2;
+            }
+            else{
+                msge.name[0] = '\0';		    //! false
+                msge.cmd_type = MC_RES;
+            }
+            msge.msg_type = msg.res_type;		//! return
+            //! send
+            if( ( msgsnd( msq_id, &msge, sizeof(ssm_msg_edge) - sizeof(long), 0 ) ) < 0 )
+                return 0;
+        }
             break;
         default:
-            if( verbosity_mode >= 1 )
+            if( verbosity_mode >= 1 ){
                 fprintf( stderr, "NOTICE : unknown msg %d", msg.cmd_type );
+            }
             break;
         }
     }
-
     return 1;
 }
 
+
+
+/*--------------------------------------------------------------*/
+/**
+ * @brief print_help
+ * @param name
+ * @return
+ */
+/*--------------------------------------------------------------*/
 int print_help( char *name )
 {
     fprintf( stderr, "HELP\n" );
@@ -839,20 +904,30 @@ int print_help( char *name )
     return 0;
 }
 
+
+
+/*--------------------------------------------------------------*/
+/**
+ * @fn
+ * @brief arg_analyze
+ * @param argc
+ * @param argv
+ * @return
+ */
+/*--------------------------------------------------------------*/
 int arg_analyze( int argc, char **argv )
 {
     int opt, optIndex = 0, optFlag = 0;
     struct option longOpt[] = {
-        {"version", 0, &optFlag, 'V'},
-        {"without-check-msgque", 0, &optFlag, 'm'},
-        {"quiet", 0, 0, 'q'},
-        {"verbose", 0, 0, 'v'},
-        {"help", 0, 0, 'h'},
-        {0, 0, 0, 0}
-    };
+    {"version", 0, &optFlag, 'V'},
+    {"without-check-msgque", 0, &optFlag, 'm'},
+    {"quiet", 0, 0, 'q'},
+    {"verbose", 0, 0, 'v'},
+    {"help", 0, 0, 'h'},
+    {0, 0, 0, 0}
+};
 
-    while( ( opt = getopt_long( argc, argv, "vqh", longOpt, &optIndex ) ) != -1 )
-    {
+    while( ( opt = getopt_long( argc, argv, "vqh", longOpt, &optIndex ) ) != -1 ){
         switch ( opt )
         {
         case 'v':
@@ -866,38 +941,49 @@ int arg_analyze( int argc, char **argv )
             return 0;
             break;
         case 0:
+        {
+            switch ( optFlag )
             {
-                switch ( optFlag )
-                {
-                case 'V':
-                    //printf( " Ver. %s\n", PACKAGE_VERSION );
-                    return 0;
-                    break;
-                case 'm':
-                    is_check_msgque = 0;
-                    break;
-                default:
-                    break;
-                }
+            case 'V':
+                //printf( " Ver. %s\n", PACKAGE_VERSION );
+                return 0;
+                break;
+            case 'm':
+                is_check_msgque = 0;
+                break;
+            default:
+                break;
             }
+        }
             break;
         default:
-            {
-                fprintf( stderr, "help : %s -h\n", argv[0] );
-                return 0;
-            }
+        {
+            fprintf( stderr, "help : %s -h\n", argv[0] );
+            return 0;
+        }
             break;
         }
     }
     return 1;
 }
 
+
+
+/*--------------------------------------------------------------*/
+/**
+ * @fn
+ * @brief main
+ * @param argc
+ * @param argv
+ * @return
+ */
+/*--------------------------------------------------------------*/
 int main( int argc, char **argv )
 {
-    if( !arg_analyze( argc, argv ) )
-        return 1;
-    if( verbosity_mode >= 1 )
-    {
+    if( !arg_analyze( argc, argv ) ) { return 1; }
+
+    //! display start
+    if( verbosity_mode >= 1 ){
         printf( "\n" );
         printf( " --------------------------------------------------\n" );
         printf( " SSM ( Streaming data Sharing Manager )\n" );
@@ -906,13 +992,14 @@ int main( int argc, char **argv )
         printf( " --------------------------------------------------\n\n" );
     }
 
-    /* 避難口の用意 */
+    //! prepare evacuation gate
     escape_road(  );
 
     ssm_top = 0;
 
-    if( !ssm_init(  ) )
-        return -1;
+    if( !ssm_init(  ) ) { return -1;}
+
+    //! message loop
     msq_loop(  );
 
     return 0;

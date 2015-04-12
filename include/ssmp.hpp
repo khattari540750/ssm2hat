@@ -1,3 +1,11 @@
+/****************************************************************/
+/**
+  @file   ssm2hat.h
+  @brief  Library for SSM
+  @author HATTORI Kohei <hattori[at]team-lab.com>
+ */
+/****************************************************************/
+
 #ifndef __SSMP_HPP__
 #define __SSMP_HPP__
 #include "ssm.hpp"

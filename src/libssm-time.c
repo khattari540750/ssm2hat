@@ -1,3 +1,13 @@
+/****************************************************************/
+/**
+  @file   libssm2hat_time.c
+  @brief  ssm2hat library time
+  @author HATTORI Kohei <hattori[at]team-lab.com>
+ */
+/****************************************************************/
+
+
+
 #include <stdio.h>
 //#include <stdlib.h>
 #include <time.h>
@@ -5,260 +15,426 @@
 #include <sys/ipc.h>
 #include <sys/shm.h>
 #include <errno.h>
+
 #include "ssm.h"
 #include "libssm.h"
+
+
 
 /** @brief 時刻同期用変数 */
 struct ssmtime *timecontrol = NULL;
 int shm_timeid;
 
-#if _POSIX_C_SOURCE >= 199309L 
-/* timeval を double[s] に変換 */
+
+
+#if _POSIX_C_SOURCE >= 199309L
+
+/*--------------------------------------------------------------*/
+/**
+ * @fn
+ * @brief timetof
+ * @param t
+ * @return
+ */
+/*--------------------------------------------------------------*/
 static double timetof( struct timespec t )
 {
-	return ( double )t.tv_sec + ( double )t.tv_nsec / 1000000000.0;
+    return ( double )t.tv_sec + ( double )t.tv_nsec / 1000000000.0;
 }
 
-/* 現在時刻を得る */
+
+
+/*--------------------------------------------------------------*/
+/**
+ * @fn
+ * @brief  gettimeSSM_real
+ * @return
+ */
+/*--------------------------------------------------------------*/
 ssmTimeT gettimeSSM_real( void )
 {
-	struct timespec current;
+    struct timespec current;
 
-	clock_gettime( CLOCK_REALTIME, &current );
-	return timetof( current );
+    clock_gettime( CLOCK_REALTIME, &current );
+    return timetof( current );
 }
 
-/* ssm時刻の速度に応じたnanosleep */
+
+
+/*--------------------------------------------------------------*/
+/**
+ * @fn
+ * @brief nanosleepSSM
+ * @param req
+ * @param rem
+ * @return
+ */
+/*--------------------------------------------------------------*/
 int nanosleepSSM(const struct timespec *req, struct timespec *rem)
 {
-	if(timecontrol != NULL && timecontrol->speed != 0.0)
-	{
-		struct timespec t;
-		double sec, speed = timecontrol->speed;
-		if(speed < 0.0)speed = -speed;
-		sec = req->tv_sec / timecontrol->speed;
+    if(timecontrol != NULL && timecontrol->speed != 0.0){
+        struct timespec t;
+        double sec, speed = timecontrol->speed;
+        if(speed < 0.0)speed = -speed;
+        sec = req->tv_sec / timecontrol->speed;
 
-		t.tv_sec = sec;
-		t.tv_nsec = (sec - t.tv_sec) * 1000000000.0;
-		t.tv_nsec += (req->tv_nsec / speed);
-		t.tv_sec += t.tv_nsec / 1000000000;
-		t.tv_nsec %= 1000000000;
+        t.tv_sec = sec;
+        t.tv_nsec = (sec - t.tv_sec) * 1000000000.0;
+        t.tv_nsec += (req->tv_nsec / speed);
+        t.tv_sec += t.tv_nsec / 1000000000;
+        t.tv_nsec %= 1000000000;
 
-		return nanosleep(&t, rem);
-	}
-	return nanosleep(req, rem);;
+        return nanosleep(&t, rem);
+    }
+    return nanosleep(req, rem);;
 }
 
-/* ssm時刻の速度に応じたsleep(の中身はnanosleep) */
-/* nanosleepの方が高精度 */
+
+
+/*--------------------------------------------------------------*/
+/**
+ * @fn
+ * @brief sleepSSM
+ * @param sec
+ * @return
+ */
+/*--------------------------------------------------------------*/
 unsigned int sleepSSM( double sec )
 {
-	struct timespec time;
-	time.tv_sec = (int)sec;
-	time.tv_nsec = (int)((sec - time.tv_sec) * 1000000000.0);
-	
-	return 	nanosleepSSM(&time, NULL);
+    struct timespec time;
+    time.tv_sec = (int)sec;
+    time.tv_nsec = (int)((sec - time.tv_sec) * 1000000000.0);
+
+    return 	nanosleepSSM(&time, NULL);
 }
 
 
-/* ssm時刻の速度に応じたusleep(の中身はnanosleep) */
-/* nanosleepの方が高精度 */
+
+/*--------------------------------------------------------------*/
+/**
+ * @fn
+ * @brief usleepSSM use nanosleep
+ * @param usec
+ * @return
+ */
+/*--------------------------------------------------------------*/
 int usleepSSM( useconds_t usec )
 {
-	struct timespec time;
-	time.tv_sec = usec / 1000000;
-	time.tv_nsec = (usec % 1000000) * 1000;
-	return nanosleepSSM(&time ,NULL);
+    struct timespec time;
+    time.tv_sec = usec / 1000000;
+    time.tv_nsec = (usec % 1000000) * 1000;
+    return nanosleepSSM(&time ,NULL);
 }
-
 
 #else /** _POSIX_C_SOURCE < 199309L */
 
 
-/* timeval を double[s] に変換 */
+
+/*--------------------------------------------------------------*/
+/**
+ * @fn
+ * @brief timetof
+ * @param t
+ * @return
+ */
+/*--------------------------------------------------------------*/
 static double timetof( struct timeval t )
 {
-	return t.tv_sec + t.tv_usec / 1000000.0;
+    return t.tv_sec + t.tv_usec / 1000000.0;
 }
 
-/* 現在時刻を得る */
+
+
+/*--------------------------------------------------------------*/
+/**
+ * @fn
+ * @brief gettimeSSM_real
+ * @return
+ */
+/*--------------------------------------------------------------*/
 ssmTimeT gettimeSSM_real( void )
 {
-	struct timeval current;
+    struct timeval current;
 
-	gettimeofday( &current, NULL );
-	return timetof( current );
+    gettimeofday( &current, NULL );
+    return timetof( current );
 
 }
 
-/* ssm時刻の速度に応じたsleep(中身はusleep) */
+
+
+/*--------------------------------------------------------------*/
+/**
+ * @fn
+ * @brief sleepSSM
+ * @param sec
+ * @return
+ */
+/*--------------------------------------------------------------*/
 unsigned int sleepSSM( double sec )
 {
-	return usleepSSM( sec * 1000000.0 );
+    return usleepSSM( sec * 1000000.0 );
 }
 
 
-/* ssm時刻の速度に応じたusleep */
+
+/*--------------------------------------------------------------*/
+/**
+ * @fn
+ * @brief  usleepSSM
+ * @param  usec
+ * @return
+ */
+/*--------------------------------------------------------------*/
 int usleepSSM( useconds_t usec )
 {
-	if(timecontrol != NULL && timecontrol->speed != 0.0)
-	{
-		double t, speed = timecontrol->speed;
-		if(speed < 0.0)speed = -speed;
-		t = (double)usec / timecontrol->speed;
+    if(timecontrol != NULL && timecontrol->speed != 0.0){
+        double t, speed = timecontrol->speed;
+        if(speed < 0.0)speed = -speed;
+        t = (double)usec / timecontrol->speed;
 
-		return usleep( (int)t );
-	}
-	return usleep( usec );
+        return usleep( (int)t );
+    }
+    return usleep( usec );
 }
 
 
 #endif	/** _POSIX_C_SOURCE  199309L */
 
-/* SSM時刻を得る */
+
+
+/*--------------------------------------------------------------*/
+/**
+ * @fn
+ * @brief  gettimeSSM
+ * @return
+ */
+/*--------------------------------------------------------------*/
 ssmTimeT gettimeSSM( void )
 {
-	if(timecontrol != NULL)
-	{
-		if( timecontrol->is_pause ){ return timecontrol->pausetime; }
-		return timecontrol->speed * gettimeSSM_real() + timecontrol->offset;
-	}
-	return gettimeSSM_real();
+    if(timecontrol != NULL){
+        if( timecontrol->is_pause ){ return timecontrol->pausetime; }
+        return timecontrol->speed * gettimeSSM_real() + timecontrol->offset;
+    }
+    return gettimeSSM_real();
 }
 
 
-/* SSM時刻を設定 */
+
+/*--------------------------------------------------------------*/
+/**
+ * @fn
+ * @brief  settimeSSM
+ * @param  time
+ * @return
+ */
+/*--------------------------------------------------------------*/
 int settimeSSM( ssmTimeT time )
 {
-	if(timecontrol != NULL)
-	{
-		timecontrol->offset = time - timecontrol->speed * gettimeSSM_real();
-		timecontrol->pausetime = time;
-		return 1;
-	}
-	return 0;
+    if(timecontrol != NULL){
+        timecontrol->offset = time - timecontrol->speed * gettimeSSM_real();
+        timecontrol->pausetime = time;
+        return 1;
+    }
+    return 0;
 }
 
-/* SSM時刻の現在時刻に対する速度の比率の設定 */
+
+
+/*--------------------------------------------------------------*/
+/**
+ * @fn
+ * @brief  settimeSSM_speed  rate setting
+ * @param  speed
+ * @return
+ */
+/*--------------------------------------------------------------*/
 int settimeSSM_speed( double speed )
 {
-	if(timecontrol != NULL)
-	{
-		double time = gettimeSSM();
-		timecontrol->speed = speed;
-		settimeSSM( time );
-		return 1;
-	}
-	return 0;
+    if(timecontrol != NULL){
+        double time = gettimeSSM();
+        timecontrol->speed = speed;
+        settimeSSM( time );
+        return 1;
+    }
+    return 0;
 }
 
-/* SSMの時刻の速度を得る */
+
+
+/*--------------------------------------------------------------*/
+/**
+ * @fn
+ * @brief  gettimeSSM_speed
+ * @return
+ */
+/*--------------------------------------------------------------*/
 double gettimeSSM_speed( void )
 {
-	if(timecontrol != NULL)
-	{
-		return timecontrol->speed;
-	}
-	return 1.0;
+    if(timecontrol != NULL){
+        return timecontrol->speed;
+    }
+    return 1.0;
 }
 
-/* ポーズの設定 */
+
+
+/*--------------------------------------------------------------*/
+/**
+ * @fn
+ * @brief  settimeSSM_is_pause
+ * @param  is_pause
+ * @return
+ */
+/*--------------------------------------------------------------*/
 int settimeSSM_is_pause( int is_pause )
 {
-	if(timecontrol != NULL)
-	{
-		ssmTimeT time = gettimeSSM(  );
-		timecontrol->pausetime = time;
-		settimeSSM( time );
-		timecontrol->is_pause = is_pause;
-		return 1;
-	}
-	return 0;
+    if(timecontrol != NULL){
+        ssmTimeT time = gettimeSSM(  );
+        timecontrol->pausetime = time;
+        settimeSSM( time );
+        timecontrol->is_pause = is_pause;
+        return 1;
+    }
+    return 0;
 }
 
-/* ポーズしているかどうか */
+
+
+/*--------------------------------------------------------------*/
+/**
+ * @fn
+ * @brief  gettimeSSM_is_pause
+ * @return
+ */
+/*--------------------------------------------------------------*/
 int gettimeSSM_is_pause( void )
 {
-	if(timecontrol != NULL)
-	{
-		return timecontrol->is_pause;
-	}
-	return 0;
+    if(timecontrol != NULL){
+        return timecontrol->is_pause;
+    }
+    return 0;
 }
 
-/* 逆再生の設定 */
+
+
+/*--------------------------------------------------------------*/
+/**
+ * @fn
+ * @brief  settimeSSM_is_reverse
+ * @param  is_reverse
+ * @return 1
+ */
+/*--------------------------------------------------------------*/
 int settimeSSM_is_reverse( int is_reverse )
 {
-	double speed = gettimeSSM_speed();
-	if( (speed  < 0.0 && !is_reverse) || ( speed >= 0.0 && is_reverse ) )
-	{
-		settimeSSM_speed( -speed );
-	}
-	return 1;
+    double speed = gettimeSSM_speed();
+    if( (speed  < 0.0 && !is_reverse) || ( speed >= 0.0 && is_reverse ) ){
+        settimeSSM_speed( -speed );
+    }
+    return 1;
 }
 
-/* 逆再生しているかどうか*/
+
+
+/*--------------------------------------------------------------*/
+/**
+ * @fn
+ * @brief  gettimeSSM_is_reverse  check reverse
+ * @return true:1 false:0
+ */
+/*--------------------------------------------------------------*/
 int gettimeSSM_is_reverse( void )
 {
-	if(gettimeSSM_speed() < 0.0) return 1;
-	return 0;
+    if(gettimeSSM_speed() < 0.0) return 1;
+    return 0;
 }
 
 
-/*================================================================*/
-/* 以下、ユーザーの使用が禁止されている関数 */
 
+/*================user prohibition function=====================*/
 
-/** open ssm time */
+/*--------------------------------------------------------------*/
+/**
+ * @fn
+ * @brief  opentimeSSM
+ * @return false 0 ture 1
+ */
+/*--------------------------------------------------------------*/
 int opentimeSSM( void )
 {
-	if( (shm_timeid = shmget( SHM_TIME_KEY, sizeof(struct ssmtime), IPC_CREAT | 0666 )) < 0 )
-	{
-		perror("libssm : opentimeSSM : shmget ");
-		return 0;
-	}
-	if( (timecontrol = (struct ssmtime *)shmat(shm_timeid, 0, 0)) == (struct ssmtime *)-1 )
-	{
-		timecontrol = NULL;
-		perror("libssm : opentimeSSM : shmat ");
-		return 0;
-	}
-	return 1;
+    if( (shm_timeid = shmget( SHM_TIME_KEY, sizeof(struct ssmtime), IPC_CREAT | 0666 )) < 0 ){
+        perror("libssm : opentimeSSM : shmget ");
+        return 0;
+    }
+    if( (timecontrol = (struct ssmtime *)shmat(shm_timeid, 0, 0)) == (struct ssmtime *)-1 ){
+        timecontrol = NULL;
+        perror("libssm : opentimeSSM : shmat ");
+        return 0;
+    }
+    return 1;
 }
-/** close ssm time */
+
+
+
+/*--------------------------------------------------------------*/
+/**
+ * @fn
+ * @brief closetimeSSM
+ */
+/*--------------------------------------------------------------*/
 void closetimeSSM( void )
 {
-	shmdt( timecontrol );
-	timecontrol = NULL;
+    shmdt( timecontrol );
+    timecontrol = NULL;
 }
 
-/* 構造体の初期化 */
+
+
+/*--------------------------------------------------------------*/
+/**
+ * @fn
+ * @brief inittimeSSM struct initialize
+ */
+/*--------------------------------------------------------------*/
 void inittimeSSM( void )
 {
-	if(timecontrol != NULL)
-	{
-		timecontrol->offset = 0.0;
-		timecontrol->speed = 1.0;
-		timecontrol->is_pause = 0;
-	}
+    if(timecontrol != NULL){
+        timecontrol->offset = 0.0;
+        timecontrol->speed = 1.0;
+        timecontrol->is_pause = 0;
+    }
 }
 
 
-//------------------------------------------------
-// coordinator専用
 
-/** create ssm time */
+/*=========================coordinator==========================*/
+
+/*--------------------------------------------------------------*/
+/**
+ * @fn
+ * @brief  createtimeSSM using coordinator
+ * @return
+ */
+/*--------------------------------------------------------------*/
 int createtimeSSM( void )
 {
-	return opentimeSSM(  );//現状ではopenと一緒
+    return opentimeSSM(  );
 }
 
-/** destroy time ssm*/
+
+
+/*--------------------------------------------------------------*/
+/**
+ * @fn
+ * @brief  destroytimeSSM
+ * @return
+ */
+/*--------------------------------------------------------------*/
 int destroytimeSSM( void )
 {
-	closetimeSSM(  );
-	if(shm_timeid >= 0 )
-		shmctl( shm_timeid, IPC_RMID, 0 );
-	return 1;
+    closetimeSSM(  );
+    if(shm_timeid >= 0 )
+        shmctl( shm_timeid, IPC_RMID, 0 );
+    return 1;
 }
-

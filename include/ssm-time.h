@@ -1,3 +1,11 @@
+/****************************************************************/
+/**
+  @file   ssm2hat.h
+  @brief  Library for SSM
+  @author HATTORI Kohei <hattori[at]team-lab.com>
+ */
+/****************************************************************/
+
 /** 
  * @file ssm-time.h
  * @brief SSM 用共通時間ライブラリ用ヘッダ
