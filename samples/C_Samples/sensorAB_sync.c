@@ -2,8 +2,8 @@
 #include <unistd.h>
 
 #include <ssm.h>
-#include "SensorA.h"
-#include "SensorB.h"
+#include "sensorA.h"
+#include "sensorB.h"
 
 int main(int argc, char *argv[]) {
 	SensorA sens_dataA;

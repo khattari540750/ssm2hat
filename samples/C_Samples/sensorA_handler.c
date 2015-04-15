@@ -2,7 +2,7 @@
 #include <unistd.h>
 
 #include <ssm.h>
-#include "SensorA.h"
+#include "sensorA.h"
 
 SensorA sens_data;
 
