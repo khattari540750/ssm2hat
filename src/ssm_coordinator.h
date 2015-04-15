@@ -1,8 +1,8 @@
 #ifndef __SSM_COORDINATOR_H__
 #define __SSM_COORDINATOR_H__
 
-#include "ssm.h"
-#include "ssm-time.h"
+#include "ssm2hat.h"
+#include "ssm2hat_time.h"
 
 
 

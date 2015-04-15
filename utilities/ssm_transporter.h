@@ -1,7 +1,7 @@
 #ifndef __SSM_TRANSPORTER_H__
 #define __SSM_TRANSPORTER_H__
 
-#include "ssm.h"
+#include "ssm2hat.h"
 
 typedef struct _ssmt_header {
 	int head;

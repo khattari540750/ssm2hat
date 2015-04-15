@@ -24,8 +24,8 @@
 
 #include <list>
 
-#include "ssm.h"
-#include "libssm.h"
+#include "ssm2hat.h"
+#include "ssm2hat_lib.h"
 #include "ssm_coordinator.h"
 
 #ifdef HAVE_CONFIG_H

@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <unistd.h>
 
-#include <ssm.h>
+#include <ssm2hat.h>
 #include "sensorA.h"
 #include "sensorB.h"
 

@@ -15,7 +15,7 @@
 #  define  __attribute__(x)  /*NOTHING*/
 #endif
 
-#include "ssm-time.h"
+#include "ssm2hat_time.h"
 
 #ifdef __cplusplus
 extern "C"

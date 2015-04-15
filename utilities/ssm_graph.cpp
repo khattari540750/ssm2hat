@@ -8,7 +8,7 @@
 #include <sstream>
 #include <string>
 
-#include "libssm.h"
+#include "ssm2hat_lib.h"
 
 #define __MAIN__
 

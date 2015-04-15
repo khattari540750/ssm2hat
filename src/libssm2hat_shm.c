@@ -12,7 +12,7 @@
 #include <sys/time.h>
 #include <pthread.h>
 
-#include "libssm.h"
+#include "ssm2hat_lib.h"
 
 
 

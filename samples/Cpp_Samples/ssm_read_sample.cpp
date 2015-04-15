@@ -12,7 +12,7 @@
 #include <unistd.h>
 #include <signal.h>
 // その他
-#include <ssm.hpp>
+#include <ssm2hat.hpp>
 #include "int_ssm.h"
 // おまじない
 using namespace std;
