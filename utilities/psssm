@@ -1,2 +1,0 @@
-#!/bin/bash
-ps `grep libssm.so /proc/*/maps | cut -d / -f 3 | sort -r | uniq`

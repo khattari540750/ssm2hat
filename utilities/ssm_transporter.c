@@ -19,7 +19,7 @@
 
 #include "ssm.h"
 #include "ssm-time.h"
-#include "ssm-transporter.h"
+#include "ssm_transporter.h"
 
 int sockfd, infd;
 struct sockaddr_in srv;
