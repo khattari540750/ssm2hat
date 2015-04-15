@@ -20,8 +20,8 @@ set(CMAKE_CXX_FLAGS "-Wall")
 set(EXECUTABLE_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/utilities)
 
 
-# install ssm-advance-player script
-install(FILES ssm-advance-player DESTINATION bin 
+# install ssm_advance_player script
+install(FILES ssm_advance_player DESTINATION bin 
         PERMISSIONS OWNER_READ OWNER_WRITE OWNER_EXECUTE 
         GROUP_READ GROUP_EXECUTE WORLD_READ WORLD_EXECUTE)
 
@@ -51,43 +51,43 @@ target_link_libraries(lsssm ssm)
 install(TARGETS lsssm DESTINATION bin)
 
 
-# build and install ssm-logger
+# build and install ssm_logger
 #set(CMAKE_C_FLAGS "-D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64")
 #set(CMAKE_CXX_FLAGS "-D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64")
-add_executable(ssm-logger ssm-logger.cpp)
-target_link_libraries(ssm-logger ssm m)
-install(TARGETS ssm-logger DESTINATION bin)
+add_executable(ssm_logger ssm_logger.cpp)
+target_link_libraries(ssm_logger ssm m)
+install(TARGETS ssm_logger DESTINATION bin)
 
 
-# build and install ssm-player
+# build and install ssm_player
 #set(CMAKE_C_FLAGS "-D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64")
 #set(CMAKE_CXX_FLAGS "-D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64")
-add_executable(ssm-player ssm-player.cpp)
-target_link_libraries(ssm-player ssm m)
-install(TARGETS ssm-player DESTINATION bin)
+add_executable(ssm_player ssm_player.cpp)
+target_link_libraries(ssm_player ssm m)
+install(TARGETS ssm_player DESTINATION bin)
 
 
-# build and install ssm-transporter
+# build and install ssm_transporter
 #set(CMAKE_C_FLAGS "-D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64")
 #set(CMAKE_CXX_FLAGS "-D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64")
-add_executable(ssm-transporter ssm-transporter.c)
-target_link_libraries(ssm-transporter ssm m pthread)
-install(TARGETS ssm-transporter DESTINATION bin)
+add_executable(ssm_transporter ssm_transporter.c)
+target_link_libraries(ssm_transporter ssm m pthread)
+install(TARGETS ssm_transporter DESTINATION bin)
 
 
-# build and install ssm-date
-add_executable(ssm-date ssm-date.c)
-target_link_libraries(ssm-date ssm)
-install(TARGETS ssm-date DESTINATION bin)
+# build and install ssm_date
+add_executable(ssm_date ssm_date.c)
+target_link_libraries(ssm_date ssm)
+install(TARGETS ssm_date DESTINATION bin)
 
 
-# build and install ssm-monitor
-add_executable(ssm-monitor ssm-monitor.c)
-target_link_libraries(ssm-monitor ssm)
-install(TARGETS ssm-monitor DESTINATION bin)
+# build and install ssm_monitor
+add_executable(ssm_monitor ssm_monitor.c)
+target_link_libraries(ssm_monitor ssm)
+install(TARGETS ssm_monitor DESTINATION bin)
 
 
-# build and install ssm-graph
-add_executable(ssm-graph ssm-graph.cpp)
-target_link_libraries(ssm-graph ssm)
-install(TARGETS ssm-graph DESTINATION bin)
+# build and install ssm_graph
+add_executable(ssm_graph ssm_graph.cpp)
+target_link_libraries(ssm_graph ssm)
+install(TARGETS ssm_graph DESTINATION bin)

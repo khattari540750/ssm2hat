@@ -2,7 +2,7 @@
 #include <unistd.h>
 
 #include <ssm.h>
-#include "SensorA.h"
+#include "sensorA.h"
 
 int main(int argc, char *argv[]) {
 	SensorA sens_data; /*sensor_Aのデータ取得用*/

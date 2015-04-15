@@ -21,30 +21,30 @@ set(EXECUTABLE_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/samples/C_Samples)
 
 
 # build sensorA_handler
-add_executable(sensorA_handler SensorAHandler.c)
+add_executable(sensorA_handler sensorA_handler.c)
 target_link_libraries(sensorA_handler ssm m)
 
 
 # build sensorA_continual_read
-add_executable(sensorA_continual_read SensorAContinualRead.c)
+add_executable(sensorA_continual_read sensorA_continual_read.c)
 target_link_libraries(sensorA_continual_read ssm m)
 
 
 # build sensorA_interval_read
-add_executable(sensorA_interval_read SensorAIntervalRead.c)
+add_executable(sensorA_interval_read sensorA_interval_read.c)
 target_link_libraries(sensorA_interval_read ssm m)
 
 
 # build sensorA_past_read
-add_executable(sensorA_past_read SensorAPastRead.c)
+add_executable(sensorA_past_read sensorA_past_read.c)
 target_link_libraries(sensorA_past_read ssm m)
 
 
 # build sensorB_handler
-add_executable(sensorB_handler SensorBHandler.c)
+add_executable(sensorB_handler sensorB_handler.c)
 target_link_libraries(sensorB_handler ssm m)
 
 
 # build sensorAB_sync
-add_executable(sensorAB_sync SensorABSync.c)
+add_executable(sensorAB_sync sensorAB_sync.c)
 target_link_libraries(sensorAB_sync ssm m)

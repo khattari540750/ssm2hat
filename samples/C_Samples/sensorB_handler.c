@@ -2,7 +2,7 @@
 #include <unistd.h>
 
 #include <ssm.h>
-#include "SensorB.h"
+#include "sensorB.h"
 
 void receive_sensorB(SensorB *data, double *time) {
 	static double a;
