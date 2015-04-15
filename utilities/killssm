@@ -1,3 +1,4 @@
+
 #!/bin/bash
 
 SSM_NAME='ssm-coordinator'
