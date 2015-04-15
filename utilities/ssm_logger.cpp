@@ -11,7 +11,7 @@
 
 #define __MAIN__
 #include "printlog.hpp"
-#include "ssm-log.hpp"
+#include "ssm2hat_log.hpp"
 
 using namespace std;
 

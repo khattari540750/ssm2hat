@@ -14,7 +14,7 @@
 #include <sstream>
 #include <cstring>
 
-#include <ssm.hpp>
+#include <ssm2hat.hpp>
 
 /**
  * @brief SSMのログにアクセスするためのクラス

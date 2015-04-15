@@ -8,7 +8,7 @@
 
 #ifndef __SSMP_HPP__
 #define __SSMP_HPP__
-#include "ssm.hpp"
+#include "ssm2hat.hpp"
 #include <cstdlib>
 
 #define SSMApiP SSMPApi
