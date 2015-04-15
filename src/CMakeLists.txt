@@ -21,7 +21,7 @@ set(CMAKE_CXX_FLAGS "-Wall")
 set(LIBRARY_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/src)
 add_library(ssmStatic STATIC libssm2hat_shm.c libssm2hat_time.c libssm2hat.c)
 target_link_libraries (ssmStatic pthread)
-set_target_properties(ssmStatic PROPERTIES OUTPUT_NAME ssm)
+set_target_properties(ssmStatic PROPERTIES OUTPUT_NAME ssm2hat)
 install(TARGETS ssmStatic DESTINATION lib)
 
 
@@ -29,7 +29,7 @@ install(TARGETS ssmStatic DESTINATION lib)
 set(LIBRARY_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/src)
 add_library(ssmShared SHARED libssm2hat_shm.c libssm2hat_time.c libssm2hat.c)
 target_link_libraries (ssmShared pthread)
-set_target_properties(ssmShared PROPERTIES OUTPUT_NAME ssm)
+set_target_properties(ssmShared PROPERTIES OUTPUT_NAME ssm2hat)
 install(TARGETS ssmShared DESTINATION lib)
 
 

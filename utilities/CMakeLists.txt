@@ -47,7 +47,7 @@ install(FILES topssm DESTINATION bin
 #set(CMAKE_C_FLAGS "-D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64")
 #set(CMAKE_CXX_FLAGS "-D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64")
 add_executable(lsssm lsssm.c)
-target_link_libraries(lsssm ssm)
+target_link_libraries(lsssm ssm2hat)
 install(TARGETS lsssm DESTINATION bin)
 
 
@@ -55,7 +55,7 @@ install(TARGETS lsssm DESTINATION bin)
 #set(CMAKE_C_FLAGS "-D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64")
 #set(CMAKE_CXX_FLAGS "-D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64")
 add_executable(ssm_logger ssm_logger.cpp)
-target_link_libraries(ssm_logger ssm m)
+target_link_libraries(ssm_logger ssm2hat m)
 install(TARGETS ssm_logger DESTINATION bin)
 
 
@@ -63,7 +63,7 @@ install(TARGETS ssm_logger DESTINATION bin)
 #set(CMAKE_C_FLAGS "-D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64")
 #set(CMAKE_CXX_FLAGS "-D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64")
 add_executable(ssm_player ssm_player.cpp)
-target_link_libraries(ssm_player ssm m)
+target_link_libraries(ssm_player ssm2hat m)
 install(TARGETS ssm_player DESTINATION bin)
 
 
@@ -71,23 +71,23 @@ install(TARGETS ssm_player DESTINATION bin)
 #set(CMAKE_C_FLAGS "-D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64")
 #set(CMAKE_CXX_FLAGS "-D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64")
 add_executable(ssm_transporter ssm_transporter.c)
-target_link_libraries(ssm_transporter ssm m pthread)
+target_link_libraries(ssm_transporter ssm2hat m pthread)
 install(TARGETS ssm_transporter DESTINATION bin)
 
 
 # build and install ssm_date
 add_executable(ssm_date ssm_date.c)
-target_link_libraries(ssm_date ssm)
+target_link_libraries(ssm_date ssm2hat)
 install(TARGETS ssm_date DESTINATION bin)
 
 
 # build and install ssm_monitor
 add_executable(ssm_monitor ssm_monitor.c)
-target_link_libraries(ssm_monitor ssm)
+target_link_libraries(ssm_monitor ssm2hat)
 install(TARGETS ssm_monitor DESTINATION bin)
 
 
 # build and install ssm_graph
 add_executable(ssm_graph ssm_graph.cpp)
-target_link_libraries(ssm_graph ssm)
+target_link_libraries(ssm_graph ssm2hat)
 install(TARGETS ssm_graph DESTINATION bin)
