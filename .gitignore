@@ -3,7 +3,7 @@
 *.dylib
 config.h
 config.h.in
-src/ssm-coordinator
+src/ssm_coordinator
 samples/C_Samples/sensorAB_sync
 samples/C_Samples/sensorA_continual_read
 samples/C_Samples/sensorA_handler
