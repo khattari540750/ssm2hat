@@ -22,9 +22,9 @@ set(EXECUTABLE_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/samples/Cpp_Samples)
 
 # build ssm_write_sample
 add_executable(ssm_write_sample ssm_write_sample.cpp)
-target_link_libraries(ssm_write_sample ssm m)
+target_link_libraries(ssm_write_sample ssm2hat m)
 
 
 # build ssm_read_sample
 add_executable(ssm_read_sample ssm_read_sample.cpp)
-target_link_libraries(ssm_read_sample ssm m)
+target_link_libraries(ssm_read_sample ssm2hat m)
