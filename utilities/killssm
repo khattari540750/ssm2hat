@@ -30,6 +30,7 @@ killall -s SIGINT ${SSM_NAME} #<--for Linux?
 
 ################# OSX script #################
 SSM_NAME='ssm_coordinator'
+process=`grep libssm.so /proc/*/maps | cut -d / -f 3 | uniq`
 
 #全てのプロセスにSIGINTを送る
 for i in ${process}
