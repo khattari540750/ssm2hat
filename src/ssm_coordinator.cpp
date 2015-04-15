@@ -481,7 +481,7 @@ int msq_loop( void )
         case MC_INITIALIZE:
             if( verbosity_mode >= 2 ){
                 printf( "message:initialize\n" );
-                printf( "   |   :process %d attach\n", msg.res_type );
+                printf( "   |   :process %ld attach\n", msg.res_type );
             }
             /* プロセスをSSMに登録 */
             node.push_back( Node( msg.res_type ) );
@@ -489,7 +489,7 @@ int msq_loop( void )
         case MC_TERMINATE:
             if( verbosity_mode >= 2 ){
                 printf( "message:terminate\n" );
-                printf( "   |   :process %d detach\n", msg.res_type );
+                printf( "   |   :process %ld detach\n", msg.res_type );
             }
             /* プロセスをSSMから削除 */
         {
@@ -552,7 +552,7 @@ int msq_loop( void )
                 return 0;
 
             if( verbosity_mode >= 2 )
-                printf( "   |   :received shm_id:%d offset:%d\n", msg.suid, msg.ssize );
+                printf( "   |   :received shm_id:%d offset:%lu\n", msg.suid, msg.ssize );
             break;
 
         case MC_OPEN:							/* センサのオープン */
@@ -585,7 +585,7 @@ int msq_loop( void )
             if( ( msgsnd( msq_id, &msg, SSM_MSG_SIZE, 0 ) ) < 0 )
                 return 0;
             if( verbosity_mode >= 2 )
-                printf( "   |   :received shm_id%d offset%d\n", msg.suid, msg.ssize );
+                printf( "   |   :received shm_id%d offset%lu\n", msg.suid, msg.ssize );
             break;
 
         case MC_CLOSE:
