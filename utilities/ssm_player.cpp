@@ -18,7 +18,7 @@
 #define __MAIN__
 
 #include "ssm2hat.hpp"
-#include "libssm.h"
+#include "ssm2hat_lib.h"
 #include "ssm2hat_log.hpp"
 #include "printlog.hpp"
 

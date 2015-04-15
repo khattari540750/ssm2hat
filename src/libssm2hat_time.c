@@ -16,8 +16,8 @@
 #include <sys/shm.h>
 #include <errno.h>
 
-#include "ssm.h"
-#include "libssm.h"
+#include "ssm2hat.h"
+#include "ssm2hat_lib.h"
 
 
 

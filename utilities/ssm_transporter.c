@@ -17,8 +17,8 @@
 #include <signal.h>
 
 
-#include "ssm.h"
-#include "ssm-time.h"
+#include "ssm2hat.h"
+#include "ssm2hat_time.h"
 #include "ssm_transporter.h"
 
 int sockfd, infd;

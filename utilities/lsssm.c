@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <string.h>
-#include "ssm.h"
-#include "ssm-time.h"
+#include "ssm2hat.h"
+#include "ssm2hat_time.h"
 
 int get_unit( double *data, char *unit, double base )
 {

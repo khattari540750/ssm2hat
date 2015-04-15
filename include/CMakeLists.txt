@@ -7,4 +7,4 @@
 
 
 # install library
-install(FILES ssm.h ssm-time.h ssm2hat.hpp ssm2hat_pointer.hpp ssm2hat_log.hpp DESTINATION include)
+install(FILES ssm2hat.h ssm2hat_time.h ssm2hat_lib.h ssm2hat.hpp ssm2hat_pointer.hpp ssm2hat_log.hpp DESTINATION include)

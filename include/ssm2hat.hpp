@@ -18,7 +18,7 @@
 #define __SSM_HPP__
 
 #include <iostream>
-#include "ssm.h"
+#include "ssm2hat.h"
 
 /**
  * Dummy Class

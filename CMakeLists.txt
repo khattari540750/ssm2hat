@@ -9,7 +9,7 @@
 
 # Project setting
 cmake_minimum_required(VERSION 2.4 FATAL_ERROR)
-project(ssm)
+project(ssm2hat)
 
 
 # Project version number

@@ -19,7 +19,7 @@
 #include <pthread.h>
 #include <sys/shm.h>
 
-#include "ssm.h"
+#include "ssm2hat.h"
 
 #ifndef __GNUC__
 #  define  __attribute__(x)  /*NOTHING*/

@@ -20,7 +20,7 @@
 #include <sys/msg.h>
 #include <sys/time.h>
 #include <time.h>
-#include "libssm.h"
+#include "ssm2hat_lib.h"
 
 #ifdef HAVE_CONFIG_H
 #include <config.h>
