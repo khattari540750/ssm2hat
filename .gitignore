@@ -12,6 +12,17 @@ samples/C_Samples/SensorA_past_read
 samples/C_Samples/SensorB_handler
 samples/Cpp_Samples/ssm_read_sample
 samples/Cpp_Samples/ssm_write_sample
+utilities/killssm
+utilities/lsssm
+utilities/psssm
+utilities/topssm
+utilities/ssm_advance_player
+utilities/ssm_date
+utilities/ssm_graph
+utilities/ssm_logger
+utilities/ssm_monitor
+utilities/ssm_player
+utilities/ssm_transporter
 CMakeLists.txt.user
 
 
