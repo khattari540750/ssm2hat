@@ -13,7 +13,7 @@
 #include <signal.h>
 // その他
 #include <ssm.hpp>
-#include "intSsm.h"
+#include "int_ssm.h"
 // おまじない
 using namespace std;
 // 終了するかどうかの判定用変数
