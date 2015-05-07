@@ -1,2 +1,12 @@
 #!/bin/bash
-ps `grep libssm.so /proc/*/maps | cut -d / -f 3 | sort -r | uniq`
+#ps `grep libssm.so /proc/*/maps | cut -d / -f 3 | sort -r | uniq`
+
+
+PROCESS=`ps | awk '{print $1}'`
+for i in ${PROCESS}
+do
+	vmmap $i | grep libssm
+	if [ $? -eq 0 ]; then
+			echo $i 
+	fi
+done
