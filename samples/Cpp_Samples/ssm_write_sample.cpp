@@ -29,7 +29,7 @@ void ctrlC(int aStatus)
 inline void setSigInt(){ signal(SIGINT, ctrlC); }
 
 
-// メイン
+
 /*--------------------------------------------------------------*/
 /**
  * @brief main

@@ -23,6 +23,8 @@
 #include "printlog.hpp"
 #include "ssm2hat_log.hpp"
 
+
+
 using namespace std;
 
 static const ssmTimeT WAITTIME = 60; //[s] streamが開くまで待つ時間。これを超えると開くことを諦める
