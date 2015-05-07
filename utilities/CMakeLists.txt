@@ -1,6 +1,6 @@
 # ------------------------------------------------------------
 # ssm utilities
-# 
+#
 #  aotmatically build and install
 #  ~/utilities
 # ------------------------------------------------------------
@@ -11,7 +11,7 @@ include_directories(${PROJECT_SOURCE_DIR}/include)
 link_directories(${PROJECT_SOURCE_DIR}/src)
 
 
-# set library and comple options 
+# set library and comple options
 set(CMAKE_C_FLAGS "-Wall")
 set(CMAKE_CXX_FLAGS "-Wall")
 
@@ -20,26 +20,20 @@ set(CMAKE_CXX_FLAGS "-Wall")
 set(EXECUTABLE_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/utilities)
 
 
-# install ssm_advance_player script
-install(FILES ssm_advance_player DESTINATION bin 
-        PERMISSIONS OWNER_READ OWNER_WRITE OWNER_EXECUTE 
-        GROUP_READ GROUP_EXECUTE WORLD_READ WORLD_EXECUTE)
-
-
 # install killssm script
-install(FILES killssm DESTINATION bin 
-        PERMISSIONS OWNER_READ OWNER_WRITE OWNER_EXECUTE 
+install(FILES killssm DESTINATION bin
+        PERMISSIONS OWNER_READ OWNER_WRITE OWNER_EXECUTE
         GROUP_READ GROUP_EXECUTE WORLD_READ WORLD_EXECUTE)
 
 # install psssm script
-install(FILES psssm DESTINATION bin 
-        PERMISSIONS OWNER_READ OWNER_WRITE OWNER_EXECUTE 
+install(FILES psssm DESTINATION bin
+        PERMISSIONS OWNER_READ OWNER_WRITE OWNER_EXECUTE
         GROUP_READ GROUP_EXECUTE WORLD_READ WORLD_EXECUTE)
 
 
 # install topssm script
-install(FILES topssm DESTINATION bin 
-        PERMISSIONS OWNER_READ OWNER_WRITE OWNER_EXECUTE 
+install(FILES topssm DESTINATION bin
+        PERMISSIONS OWNER_READ OWNER_WRITE OWNER_EXECUTE
         GROUP_READ GROUP_EXECUTE WORLD_READ WORLD_EXECUTE)
 
 
