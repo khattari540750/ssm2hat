@@ -31,7 +31,6 @@ int shm_timeid;
 
 /*--------------------------------------------------------------*/
 /**
- * @fn
  * @brief timetof
  * @param t
  * @return
@@ -46,7 +45,6 @@ static double timetof( struct timespec t )
 
 /*--------------------------------------------------------------*/
 /**
- * @fn
  * @brief  gettimeSSM_real
  * @return
  */
@@ -63,7 +61,6 @@ ssmTimeT gettimeSSM_real( void )
 
 /*--------------------------------------------------------------*/
 /**
- * @fn
  * @brief nanosleepSSM
  * @param req
  * @param rem
@@ -93,7 +90,6 @@ int nanosleepSSM(const struct timespec *req, struct timespec *rem)
 
 /*--------------------------------------------------------------*/
 /**
- * @fn
  * @brief sleepSSM
  * @param sec
  * @return
@@ -112,7 +108,6 @@ unsigned int sleepSSM( double sec )
 
 /*--------------------------------------------------------------*/
 /**
- * @fn
  * @brief usleepSSM use nanosleep
  * @param usec
  * @return
@@ -132,7 +127,6 @@ int usleepSSM( useconds_t usec )
 
 /*--------------------------------------------------------------*/
 /**
- * @fn
  * @brief timetof
  * @param t
  * @return
@@ -147,7 +141,6 @@ static double timetof( struct timeval t )
 
 /*--------------------------------------------------------------*/
 /**
- * @fn
  * @brief gettimeSSM_real
  * @return
  */
@@ -165,7 +158,6 @@ ssmTimeT gettimeSSM_real( void )
 
 /*--------------------------------------------------------------*/
 /**
- * @fn
  * @brief sleepSSM
  * @param sec
  * @return
@@ -180,7 +172,6 @@ unsigned int sleepSSM( double sec )
 
 /*--------------------------------------------------------------*/
 /**
- * @fn
  * @brief  usleepSSM
  * @param  usec
  * @return
@@ -205,7 +196,6 @@ int usleepSSM( useconds_t usec )
 
 /*--------------------------------------------------------------*/
 /**
- * @fn
  * @brief  gettimeSSM
  * @return
  */
@@ -223,7 +213,6 @@ ssmTimeT gettimeSSM( void )
 
 /*--------------------------------------------------------------*/
 /**
- * @fn
  * @brief  settimeSSM
  * @param  time
  * @return
@@ -243,7 +232,6 @@ int settimeSSM( ssmTimeT time )
 
 /*--------------------------------------------------------------*/
 /**
- * @fn
  * @brief  settimeSSM_speed  rate setting
  * @param  speed
  * @return
@@ -264,7 +252,6 @@ int settimeSSM_speed( double speed )
 
 /*--------------------------------------------------------------*/
 /**
- * @fn
  * @brief  gettimeSSM_speed
  * @return
  */
@@ -281,7 +268,6 @@ double gettimeSSM_speed( void )
 
 /*--------------------------------------------------------------*/
 /**
- * @fn
  * @brief  settimeSSM_is_pause
  * @param  is_pause
  * @return
@@ -303,7 +289,6 @@ int settimeSSM_is_pause( int is_pause )
 
 /*--------------------------------------------------------------*/
 /**
- * @fn
  * @brief  gettimeSSM_is_pause
  * @return
  */
@@ -320,7 +305,6 @@ int gettimeSSM_is_pause( void )
 
 /*--------------------------------------------------------------*/
 /**
- * @fn
  * @brief  settimeSSM_is_reverse
  * @param  is_reverse
  * @return 1
@@ -339,7 +323,6 @@ int settimeSSM_is_reverse( int is_reverse )
 
 /*--------------------------------------------------------------*/
 /**
- * @fn
  * @brief  gettimeSSM_is_reverse  check reverse
  * @return true:1 false:0
  */
@@ -356,7 +339,6 @@ int gettimeSSM_is_reverse( void )
 
 /*--------------------------------------------------------------*/
 /**
- * @fn
  * @brief  opentimeSSM
  * @return false 0 ture 1
  */
@@ -379,7 +361,6 @@ int opentimeSSM( void )
 
 /*--------------------------------------------------------------*/
 /**
- * @fn
  * @brief closetimeSSM
  */
 /*--------------------------------------------------------------*/
@@ -393,7 +374,6 @@ void closetimeSSM( void )
 
 /*--------------------------------------------------------------*/
 /**
- * @fn
  * @brief inittimeSSM struct initialize
  */
 /*--------------------------------------------------------------*/
@@ -412,7 +392,6 @@ void inittimeSSM( void )
 
 /*--------------------------------------------------------------*/
 /**
- * @fn
  * @brief  createtimeSSM using coordinator
  * @return
  */
@@ -426,7 +405,6 @@ int createtimeSSM( void )
 
 /*--------------------------------------------------------------*/
 /**
- * @fn
  * @brief  destroytimeSSM
  * @return
  */

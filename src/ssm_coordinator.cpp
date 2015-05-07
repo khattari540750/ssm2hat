@@ -86,7 +86,6 @@ int emergencyCnt = 0;
 
 /*--------------------------------------------------------------*/
 /**
- * @fn
  * @brief emergency
  * @param sig
  */
@@ -126,7 +125,6 @@ static void emergency( int sig )
 
 /*--------------------------------------------------------------*/
 /**
- * @fn
  * @brief escape_road
  */
 /*--------------------------------------------------------------*/
@@ -151,7 +149,6 @@ void escape_road( void )
 
 /*--------------------------------------------------------------*/
 /**
- * @fn
  * @brief print_list
  * @param p
  */
@@ -170,7 +167,6 @@ void print_list( SSM_List * p )
 
 /*--------------------------------------------------------------*/
 /**
- * @fn
  * @brief get_receive_id
  * @return
  */
@@ -190,7 +186,6 @@ long get_receive_id( void )
 
 /*--------------------------------------------------------------*/
 /**
- * @fn
  * @brief alloc_ssm_block
  * @param ssize
  * @param hsize
@@ -238,7 +233,6 @@ int alloc_ssm_block( int ssize, int hsize, ssmTimeT cycle, char **shm_h, int *of
 
 /*--------------------------------------------------------------*/
 /**
- * @fn
  * @brief add_ssm_list
  * @param node
  * @param name
@@ -286,7 +280,6 @@ SSM_List *add_ssm_list( int node, char *name, int suid, int ssize, int hsize, ss
 
 /*--------------------------------------------------------------*/
 /**
- * @fn
  * @brief free_ssm_list
  * @param ssmp
  */
@@ -316,7 +309,6 @@ void free_ssm_list( SSM_List * ssmp )
 
 /*--------------------------------------------------------------*/
 /**
- * @fn
  * @brief ssm_init
  * @return
  */
@@ -401,7 +393,6 @@ SSM_List *search_SSM_List( char *name, int suid )
 
 /*--------------------------------------------------------------*/
 /**
- * @fn
  * @brief get_num_SSM_List
  * @return
  */
@@ -908,7 +899,6 @@ int print_help( char *name )
 
 /*--------------------------------------------------------------*/
 /**
- * @fn
  * @brief arg_analyze
  * @param argc
  * @param argv
@@ -971,7 +961,6 @@ int arg_analyze( int argc, char **argv )
 
 /*--------------------------------------------------------------*/
 /**
- * @fn
  * @brief main
  * @param argc
  * @param argv

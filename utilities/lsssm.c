@@ -1,3 +1,13 @@
+/****************************************************************/
+/**
+  @file   lsssm.c
+  @brief  ssm ls command
+  @author HATTORI Kohei <hattori[at]team-lab.com>
+ */
+/****************************************************************/
+
+
+
 #include <stdio.h>
 #include <string.h>
 #include "ssm2hat.h"
@@ -5,6 +15,7 @@
 
 
 
+/*--------------------------------------------------------------*/
 /**
  * @brief get_unit
  * @param data
@@ -12,6 +23,7 @@
  * @param base
  * @return
  */
+/*--------------------------------------------------------------*/
 int get_unit( double *data, char *unit, double base )
 {
     int i = 0;
@@ -32,12 +44,14 @@ int get_unit( double *data, char *unit, double base )
 
 
 
+/*--------------------------------------------------------------*/
 /**
  * @brief main
  * @param argc
  * @param argv
  * @return
  */
+/*--------------------------------------------------------------*/
 int main( int argc, char *argv[] )
 {
     int sid_search;

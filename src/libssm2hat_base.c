@@ -38,7 +38,6 @@ char err_msg[20];
 
 /*--------------------------------------------------------------*/
 /**
- * @fn
  * @brief calcSSM_table
  * @param life
  * @param cycle
@@ -54,7 +53,6 @@ int calcSSM_table( ssmTimeT life, ssmTimeT cycle )
 
 /*--------------------------------------------------------------*/
 /**
- * @fn
  * @brief calcSSM_life savetime calcu from table size
  * @param table_num
  * @param cycle
@@ -72,7 +70,6 @@ ssmTimeT calcSSM_life( int table_num, ssmTimeT cycle )
 
 /*--------------------------------------------------------------*/
 /**
- * @fn
  * @brief  getTID_top
  * @param  sid
  * @return newest TimeID
@@ -90,7 +87,6 @@ SSM_tid getTID_top( SSM_sid sid )
 
 /*--------------------------------------------------------------*/
 /**
- * @fn
  * @brief  getTID_bottom
  * @param  sid
  * @return oldest Time ID
@@ -106,7 +102,6 @@ SSM_tid getTID_bottom( SSM_sid sid )
 
 /*--------------------------------------------------------------*/
 /**
- * @fn
  * @brief waitTID newest tid is lerger than desighnate tid
  * @param sid
  * @param tid
@@ -123,7 +118,6 @@ int waitTID( SSM_sid sid, SSM_tid tid )
 
 /*--------------------------------------------------------------*/
 /**
- * @fn
  * @brief getTID
  * @param sid
  * @param ytime
@@ -163,7 +157,6 @@ SSM_tid getTID( SSM_sid sid, ssmTimeT ytime )
 
 /*--------------------------------------------------------------*/
 /**
- * @fn
  * @brief getTID_time search TimeID using stream cycle.
  * @param shm_p
  * @param ytime
@@ -211,7 +204,6 @@ SSM_tid getTID_time( ssm_header *shm_p, ssmTimeT ytime )
 
 /*--------------------------------------------------------------*/
 /**
- * @fn
  * @brief del_msg
  */
 /*--------------------------------------------------------------*/
@@ -226,7 +218,6 @@ void del_msg( void )
 
 /*--------------------------------------------------------------*/
 /**
- * @fn
  * @brief send_msg
  * @param cmd_type command type
  * @param msg message
@@ -261,7 +252,6 @@ int send_msg( int cmd_type, ssm_msg *msg )
 
 /*--------------------------------------------------------------*/
 /**
- * @fn
  * @brief receive_msg from coordinator reciveve
  * @param msg message
  * @return 1:suceed 0:false
@@ -293,7 +283,6 @@ int receive_msg( ssm_msg *msg )
 
 /*--------------------------------------------------------------*/
 /**
- * @fn
  * @brief  communicate_msg communicate coordinator
  * @param  cmd_type
  * @param  msg
@@ -318,7 +307,6 @@ int communicate_msg( int cmd_type, ssm_msg *msg )
 
 /*--------------------------------------------------------------*/
 /**
- * @fn
  * @brief errSSM print err message
  */
 /*--------------------------------------------------------------*/
@@ -331,7 +319,6 @@ void errSSM( void )
 
 /*--------------------------------------------------------------*/
 /**
- * @fn
  * @brief initSSM initialize shared memory and message queue
  * @return 1:suceed 0:false
  */
@@ -361,7 +348,6 @@ int initSSM( void )
 
 /*--------------------------------------------------------------*/
 /**
- * @fn
  * @brief  endSSM
  * @return 1:suceed 0:false
  */
@@ -382,7 +368,6 @@ int endSSM( void )
 
 /*--------------------------------------------------------------*/
 /**
- * @fn
  * @brief  createSSM Allocate sensor data space with time table on SSM
  * @param  name
  * @param  stream_id
@@ -468,7 +453,6 @@ SSM_sid createSSM( const char *name, int stream_id, size_t ssm_size, ssmTimeT li
 
 /*--------------------------------------------------------------*/
 /**
- * @fn
  * @brief releaseSSM release stream
  * @param sid
  * @return
@@ -487,7 +471,6 @@ int releaseSSM( SSM_sid *sid )
 
 /*--------------------------------------------------------------*/
 /**
- * @fn
  * @brief openSSM open sensor data on ssm
  * @param name
  * @param stream_id
@@ -541,7 +524,6 @@ SSM_sid openSSM( const char *name, int stream_id, char open_mode )
 
 /*--------------------------------------------------------------*/
 /**
- * @fn
  * @brief closeSSM close stream
  * @param sid
  * @return
@@ -560,7 +542,6 @@ int closeSSM( SSM_sid *sid )
 
 /*--------------------------------------------------------------*/
 /**
- * @fn
  * @brief write_data copy data to shared mimory
  * @param ssmp
  * @param data
@@ -577,7 +558,6 @@ static void write_data( void *ssmp, const void *data, void *user_data )
 
 /*--------------------------------------------------------------*/
 /**
- * @fn
  * @brief read_data copy data to shared memory
  * @param ssmp
  * @param data
@@ -594,7 +574,6 @@ static void read_data( const void *ssmp, void *data, void *user_data )
 
 /*--------------------------------------------------------------*/
 /**
- * @fn
  * @brief readSSMP
  * @param sid
  * @param adata
@@ -640,7 +619,6 @@ SSM_tid readSSMP( SSM_sid sid, void *adata, ssmTimeT * ytime, SSM_tid tid,
 
 /*--------------------------------------------------------------*/
 /**
- * @fn
  * @brief readSSM
  * @param sid
  * @param adata
@@ -658,7 +636,6 @@ SSM_tid readSSM( SSM_sid sid, void *adata, ssmTimeT *ytime, SSM_tid tid )
 
 /*--------------------------------------------------------------*/
 /**
- * @fn
  * @brief readSSMP_time
  * @param sid
  * @param adata
@@ -691,7 +668,6 @@ SSM_tid readSSMP_time( SSM_sid sid, void *adata, ssmTimeT ytime, ssmTimeT *ret_t
 
 /*--------------------------------------------------------------*/
 /**
- * @fn
  * @brief readSSM_time
  * @param sid
  * @param adata
@@ -709,7 +685,6 @@ SSM_tid readSSM_time( SSM_sid sid, void *adata, ssmTimeT ytime, ssmTimeT *ret_ti
 
 /*--------------------------------------------------------------*/
 /**
- * @fn
  * @brief writeSSMP
  * @param sid
  * @param adata
@@ -755,7 +730,6 @@ SSM_tid writeSSMP( SSM_sid sid, const void *adata, ssmTimeT ytime ,
 
 /*--------------------------------------------------------------*/
 /**
- * @fn
  * @brief writeSSM
  * @param sid
  * @param adata
@@ -772,7 +746,6 @@ SSM_tid writeSSM( SSM_sid sid, const void *adata, ssmTimeT ytime )
 
 /*--------------------------------------------------------------*/
 /**
- * @fn
  * @brief writeSSM_time
  * @param sid
  * @param adata
@@ -789,7 +762,6 @@ SSM_tid writeSSM_time( SSM_sid sid, const void *adata, ssmTimeT ytime )
 
 /*--------------------------------------------------------------*/
 /**
- * @fn
  * @brief writeSSMP_time
  * @param sid
  * @param adata
@@ -808,7 +780,6 @@ SSM_tid writeSSMP_time( SSM_sid sid, const void *adata, ssmTimeT ytime ,
 
 /*--------------------------------------------------------------*/
 /**
- * @fn
  * @brief set_propertySSM
  * @param name
  * @param sensor_uid
@@ -855,7 +826,6 @@ int set_propertySSM( const char *name, int sensor_uid, const void *adata, size_t
 
 /*--------------------------------------------------------------*/
 /**
- * @fn
  * @brief get_propertySSM
  * @param name
  * @param sensor_uid
@@ -906,7 +876,6 @@ int get_propertySSM( const char *name, int sensor_uid, void *adata )
 
 /*--------------------------------------------------------------*/
 /**
- * @fn
  * @brief damp
  * @param sid
  * @param mode
@@ -953,7 +922,6 @@ int damp( SSM_sid sid, int mode, int num )
 
 /*--------------------------------------------------------------*/
 /**
- * @fn
  * @brief  getSSM_num
  * @return error: minus value
  */
@@ -972,7 +940,6 @@ int getSSM_num( void )
 
 /*--------------------------------------------------------------*/
 /**
- * @fn
  * @brief getSSM_name
  * @param n
  * @param name
@@ -1000,7 +967,6 @@ int getSSM_name( int n, char *name, int *suid, size_t *size )
 
 /*--------------------------------------------------------------*/
 /**
- * @fn
  * @brief getSSM_info
  * @param name
  * @param suid
@@ -1038,7 +1004,6 @@ int getSSM_info( const char *name, int suid, size_t *size, int *num, double *cyc
 
 /*--------------------------------------------------------------*/
 /**
- * @fn
  * @brief getSSM_node_num
  * @return
  */
@@ -1057,7 +1022,6 @@ int getSSM_node_num( void )
 
 /*--------------------------------------------------------------*/
 /**
- * @fn
  * @brief getSSM_node_info
  * @param n
  * @param node_num
@@ -1081,7 +1045,6 @@ int getSSM_node_info( int n, int *node_num )
 
 /*--------------------------------------------------------------*/
 /**
- * @fn
  * @brief getSSM_edge_num get node connect edge number
  * @return
  */
@@ -1100,7 +1063,6 @@ int getSSM_edge_num( void )
 
 /*--------------------------------------------------------------*/
 /**
- * @fn
  * @brief getSSM_edge_info get n edge info
  * @param n
  * @param name

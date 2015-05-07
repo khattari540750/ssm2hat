@@ -18,7 +18,6 @@
 
 /*--------------------------------------------------------------*/
 /**
-  @fn
   @brief allock shm memory
   @param key_t shmget key
   @param data_size ssm stream data size
@@ -44,7 +43,6 @@ int shm_create_ssm( key_t key, int data_size, int history_num, double cycle )
 
 /*--------------------------------------------------------------*/
 /**
-  @fn
   @brief  open shm_memory
   @param  shm_id
   @return shared memory header name
@@ -67,7 +65,6 @@ ssm_header *shm_open_ssm( int shm_id )
 
 /*--------------------------------------------------------------*/
 /**
-  @fn
   @brief  init shm header
   @param  *header
   @param  data_size
@@ -106,7 +103,6 @@ void shm_init_header( ssm_header *header, int data_size, int history_num, ssmTim
 
 /*--------------------------------------------------------------*/
 /**
-  @fn
   @brief  destroy shared memory headder
   @param  *header
  */
@@ -121,7 +117,6 @@ void shm_dest_header( ssm_header *header )
 
 /*--------------------------------------------------------------*/
 /**
-  @fn
   @brief  get shared memory sid address
   @param  sid
   @return sid
@@ -136,7 +131,6 @@ ssm_header *shm_get_address( SSM_sid sid )
 
 /*--------------------------------------------------------------*/
 /**
-  @fn
   @brief  get shared memory data address
   @param  *shm_p
  */
@@ -150,7 +144,6 @@ void *shm_get_data_address( ssm_header *shm_p )
 
 /*--------------------------------------------------------------*/
 /**
- * @fn
  * @brief shm_get_data_ptr
  * @param shm_p
  * @param tid
@@ -179,7 +172,6 @@ size_t shm_get_data_size( ssm_header *shm_p )
 
 /*--------------------------------------------------------------*/
 /**
- * @fn
  * @brief  shm_get_time_address
  * @param  shm_p
  * @return ssm time
@@ -194,7 +186,6 @@ ssmTimeT *shm_get_time_address( ssm_header *shm_p )
 
 /*--------------------------------------------------------------*/
 /**
- * @fn
  * @brief shm_init_time
  * @param shm_p
  */
@@ -211,7 +202,6 @@ void shm_init_time( ssm_header *shm_p )
 
 /*--------------------------------------------------------------*/
 /**
- * @fn
  * @brief  shm_get_time
  * @param  shm_p
  * @param  tid
@@ -227,7 +217,6 @@ ssmTimeT shm_get_time( ssm_header *shm_p, SSM_tid tid )
 
 /*--------------------------------------------------------------*/
 /**
- * @fn
  * @brief shm_set_time
  * @param shm_p
  * @param tid
@@ -244,7 +233,6 @@ void shm_set_time( ssm_header *shm_p, SSM_tid tid, ssmTimeT time )
 #if 0
 /*--------------------------------------------------------------*/
 /**
- * @fn
  * @brief  shm_get_timetable_address
  * @param  shm_p
  * @return ssm tid
@@ -259,7 +247,6 @@ SSM_tid *shm_get_timetable_address( ssm_header *shm_p )
 
 /*--------------------------------------------------------------*/
 /**
- * @fn
  * @brief shm_init_timetable
  * @param shm_p
  */
@@ -279,7 +266,6 @@ void shm_init_timetable( ssm_header *shm_p )
 
 /*--------------------------------------------------------------*/
 /**
- * @fn
  * @brief shm_get_tid_top
  * @param shm_p
  * @return ssm tid
@@ -295,7 +281,6 @@ SSM_tid shm_get_tid_top( ssm_header *shm_p )
 
 /*--------------------------------------------------------------*/
 /**
- * @fn
  * @brief  shm_get_tid_bottom
  * @param  shm_p
  * @return ssm tid
@@ -320,7 +305,6 @@ SSM_tid shm_get_tid_bottom( ssm_header *shm_p )
 
 /*--------------------------------------------------------------*/
 /**
- * @fn
  * @brief  lock shm
  * @param
  * @return 1:success, 0: failed
@@ -337,7 +321,6 @@ int shm_lock( ssm_header *shm_p )
 
 /*--------------------------------------------------------------*/
 /**
- * @fn
  * @brief  unlock shm
  * @param  *shm_p
  * @return 1:success, 0: failed
@@ -354,7 +337,6 @@ int shm_unlock( ssm_header *shm_p )
 
 /*--------------------------------------------------------------*/
 /**
- * @fn
  * @brief  wait wrote TID is tid
  * @retval 1:suceed  0:false  -1:error
  */
@@ -388,7 +370,6 @@ int shm_cond_wait( ssm_header *shm_p, SSM_tid tid )
 
 /*--------------------------------------------------------------*/
 /**
- * @fn
  * @brief  shm_cond_broadcast
  * @param  shm_p
  * @return 1:succed

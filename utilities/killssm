@@ -1,49 +1,45 @@
 #!/bin/bash
 
 
-
-
-
-
 ################ LINUX script ################
-SSM_NAME='ssm_coordinator'
-process=`grep libssm.so /proc/*/maps | cut -d / -f 3 | uniq`
+#SSM_NAME='ssm_coordinator'
+#process=`grep libssm.so /proc/*/maps | cut -d / -f 3 | uniq`
 
 #全てのプロセスにSIGINTを送る
-for i in ${process}
-do
-	name=`cat "/proc/$i/cmdline" | tr '\0' ' ' | cut -d ' '  -f1`
-	if [ ${name} = ${SSM_NAME} ]; then
-		continue;
-	fi
-	echo $i  $name
-	kill -s SIGINT $i
-	sleep 0.01
-done
+#for i in ${process}
+#do
+#	name=`cat "/proc/$i/cmdline" | tr '\0' ' ' | cut -d ' '  -f1`
+#	if [ ${name} = ${SSM_NAME} ]; then
+#		continue;
+#	fi
+#	echo $i  $name
+#	kill -s SIGINT $i
+#	sleep 0.01
+#done
 
 # last shutdown ssm_coordinator
-sleep 1
-killall -s SIGINT ${SSM_NAME} #<--for Linux?
+#sleep 1
+#killall -s SIGINT ${SSM_NAME} #<--for Linux?
 #kill -SIGINT `grep libssm.so /proc/*/maps | cut -d / -f 3 | uniq`
 
 
 
 ################# OSX script #################
 SSM_NAME='ssm_coordinator'
-process=`grep libssm.so /proc/*/maps | cut -d / -f 3 | uniq`
+COORDINATOR_ID=`pgrep ${SSM_NAME}`
+PROCESS=`ps | awk '{print $1}'`
 
-#全てのプロセスにSIGINTを送る
-for i in ${process}
+#sending all process to signal "SIGINT"
+for i in ${PROCESS}
 do
-	name=`cat "/proc/$i/cmdline" | tr '\0' ' ' | cut -d ' '  -f1`
-	if [ ${name} = ${SSM_NAME} ]; then
-		continue;
+	if [ $i != ${COORDINATOR_ID} ]; then
+		vmmap $i | grep libssm
+		if [ $? -eq 0 ]; then
+			kill -SIGINT $i 
+		fi
 	fi
-	echo $i  $name
-	kill -s SIGINT $i
-	sleep 0.01
 done
 
 # last shutdown ssm_coordinator
 sleep 1
-killall -SIGINT ${SSM_NAME}  #<--for mac?
+killall -SIGINT ${SSM_NAME} 
