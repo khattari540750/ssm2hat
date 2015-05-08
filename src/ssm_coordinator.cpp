@@ -29,7 +29,6 @@
 //#include "ssm2hat_time.h"
 //#include "ssm_coordinator.h"
 
-
 #ifdef HAVE_CONFIG_H
 #include <config.h>
 #endif
@@ -187,7 +186,8 @@ void print_list( SSM_List * p )
 {
     while( p ){
         printf( "   |   :name : %s\n", p->name );
-        printf( "   |   :ID: %d  offset: %d  size: %d  address: %ld \n   |\n", p->shm_id, p->shm_offset, p->size,
+        printf( "   |   :ID: %d  offset: %d  size: %d  address: %ld \n   |\n",
+                p->shm_id, p->shm_offset, p->size,
                 ( long )p->shm_ptr );
         p = p->next;
     }

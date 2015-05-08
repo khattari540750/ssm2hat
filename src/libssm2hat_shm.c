@@ -1,7 +1,7 @@
 /****************************************************************/
 /**
   @file   libssm2hat_shm.c
-  @brief  ssm2hat library shm
+  @brief  ssm2hat shared memory setting relation function
   @author HATTORI Kohei <hattori[at]team-lab.com>
  */
 /****************************************************************/
@@ -18,12 +18,12 @@
 
 /*--------------------------------------------------------------*/
 /**
-  @brief allock shm memory
-  @param key_t shmget key
-  @param data_size ssm stream data size
-  @param history_num
-  @param cycle
-  @return false: failed, suceed: shm id
+ * @brief allock shm memory
+ * @param key_t shmget key
+ * @param data_size ssm stream data size
+ * @param history_num
+ * @param cycle
+ * @return false: -1, suceed: shm id
  */
 /*--------------------------------------------------------------*/
 int shm_create_ssm( key_t key, int data_size, int history_num, double cycle )
@@ -31,11 +31,11 @@ int shm_create_ssm( key_t key, int data_size, int history_num, double cycle )
     int shm_id;
 
     //! get shared memory,  size = ssm header + data + timestamp
-    shm_id = shmget( key, sizeof( ssm_header ) + ( data_size + sizeof ( ssmTimeT ) ) * history_num, IPC_CREAT | 0666 );
+    shm_id = shmget( key, sizeof( ssm_header )
+                     + ( data_size + sizeof ( ssmTimeT ) )
+                     * history_num, IPC_CREAT | 0666 );
 
-    if( shm_id < 0 ){
-        return -1;
-    }
+    if( shm_id < 0 ) return -1;
     return shm_id;
 }
 
@@ -43,9 +43,9 @@ int shm_create_ssm( key_t key, int data_size, int history_num, double cycle )
 
 /*--------------------------------------------------------------*/
 /**
-  @brief  open shm_memory
-  @param  shm_id
-  @return shared memory header name
+ * @brief  open shm_memory
+ * @param  shm_id
+ * @return false: -1, suceed: shared memory header name
  */
 /*--------------------------------------------------------------*/
 ssm_header *shm_open_ssm( int shm_id )
@@ -55,9 +55,7 @@ ssm_header *shm_open_ssm( int shm_id )
     //! attach memory
     header = shmat( shm_id, 0, 0 );
 
-    if( header == ( ssm_header * )-1 ){
-        return 0;
-    }
+    if( header == ( ssm_header * )-1 ) return 0;
     return header;
 }
 
@@ -65,11 +63,11 @@ ssm_header *shm_open_ssm( int shm_id )
 
 /*--------------------------------------------------------------*/
 /**
-  @brief  init shm header
-  @param  *header
-  @param  data_size
-  @param  history_num
-  @param  cycle
+ * @brief  init shm header
+ * @param  *header
+ * @param  data_size
+ * @param  history_num
+ * @param  cycle
  */
 /*--------------------------------------------------------------*/
 void shm_init_header( ssm_header *header, int data_size, int history_num, ssmTimeT cycle )
@@ -77,14 +75,19 @@ void shm_init_header( ssm_header *header, int data_size, int history_num, ssmTim
     pthread_mutexattr_t mattr;
     pthread_condattr_t cattr;
 
-    header->tid_top = SSM_TID_SP - 1;	//! initial position
-    header->size = data_size;	//! data size
-    header->num = history_num;	//! history number
-    //header->table_size = hsize;	//! table size
-    header->cycle = cycle;	//! data mimimum size
-    header->data_off = sizeof( ssm_header );	//! data beginning address
-    header->times_off = header->data_off + ( data_size * history_num );	//! time beginning address
-    //header->table_off = header->times_off + sizeof( ssmTimeT ) * hsize ;	//! time table's beginng address
+    header->tid_top = SSM_TID_SP - 1;  //! initial position
+    header->size = data_size;	       //! data size
+    header->num = history_num;	       //! history number
+    //header->table_size = hsize;	   //! table size
+    header->cycle = cycle;	           //! data mimimum size
+    header->data_off
+            = sizeof( ssm_header );	   //! data beginning address
+    header->times_off
+            = header->data_off + ( data_size * history_num );
+                                       //! time beginning address
+    //header->table_off
+    //      = header->times_off + sizeof( ssmTimeT ) * hsize;
+                                       //! time table's beginng address
 
     //! initialize synchronize mutex
     pthread_mutexattr_init(&mattr);
@@ -119,7 +122,7 @@ void shm_dest_header( ssm_header *header )
 /**
   @brief  get shared memory sid address
   @param  sid
-  @return sid
+  @return sid header
  */
 /*--------------------------------------------------------------*/
 ssm_header *shm_get_address( SSM_sid sid )
@@ -273,7 +276,6 @@ void shm_init_timetable( ssm_header *shm_p )
 /*--------------------------------------------------------------*/
 SSM_tid shm_get_tid_top( ssm_header *shm_p )
 {
-    //! return tid
     return shm_p->tid_top;
 }
 
@@ -289,15 +291,11 @@ SSM_tid shm_get_tid_top( ssm_header *shm_p )
 SSM_tid shm_get_tid_bottom( ssm_header *shm_p )
 {
     int tid;
-    if( shm_p->tid_top < 0 )
-        return shm_p->tid_top;
 
-    //! return tid
+    if( shm_p->tid_top < 0 ) return shm_p->tid_top;
     tid = shm_p->tid_top - shm_p->num + SSM_MARGIN + 1;
 
-    if( tid < 0 )
-        return 0;
-
+    if( tid < 0 ) return 0;
     return tid;
 }
 
@@ -312,8 +310,7 @@ SSM_tid shm_get_tid_bottom( ssm_header *shm_p )
 /*--------------------------------------------------------------*/
 int shm_lock( ssm_header *shm_p )
 {
-    if( pthread_mutex_lock( &shm_p->mutex ) )
-        return 0;
+    if( pthread_mutex_lock( &shm_p->mutex ) ) return 0;
     return 1;
 }
 
@@ -328,8 +325,7 @@ int shm_lock( ssm_header *shm_p )
 /*--------------------------------------------------------------*/
 int shm_unlock( ssm_header *shm_p )
 {
-    if( pthread_mutex_unlock( &shm_p->mutex ) )
-        return 0;
+    if( pthread_mutex_unlock( &shm_p->mutex ) ) return 0;
     return 1;
 }
 
@@ -347,22 +343,18 @@ int shm_cond_wait( ssm_header *shm_p, SSM_tid tid )
     struct timeval now;
     struct timespec tout;
 
-    if( tid <= shm_get_tid_top( shm_p ) )
-        return 1;
+    if( tid <= shm_get_tid_top( shm_p ) ) return 1;
     gettimeofday( &now, NULL );
     tout.tv_sec = now.tv_sec + 1;
     tout.tv_nsec = now.tv_usec * 1000;
 
+    if( !shm_lock( shm_p ) ) return -1;
 
-    if( !shm_lock( shm_p ) )
-        return -1;
-
-    while( tid > shm_get_tid_top( shm_p ) && (ret == 0) ){
+    while( tid > shm_get_tid_top( shm_p ) && (ret == 0) )
         ret = pthread_cond_timedwait( &shm_p->cond, &shm_p->mutex, &tout );
-    }
 
-    if( !shm_unlock( shm_p ) )
-        return -1;
+
+    if( !shm_unlock( shm_p ) ) return -1;
     return ( ret == 0 );
 }
 

@@ -26,42 +26,19 @@
 
 
 using namespace std;
-
-static const ssmTimeT WAITTIME = 60; //[s] streamが開くまで待つ時間。これを超えると開くことを諦める
-
+static const ssmTimeT WAITTIME = 60; //![s] wait for stream open
 bool gShutOff = false;
 
 
 
-/*--------------------------------------------------------------*/
+/*==============================================================*/
 /**
- * @brief ctrlC
- * @param aStatus
+ * @brief The MyParam class
  */
-/*--------------------------------------------------------------*/
-void ctrlC( int aStatus )
-{
-    // exit(aStatus); // デストラクタが呼ばれないのでダメ
-    gShutOff = true;
-    signal( SIGINT, NULL );
-}
-
-
-
-/*--------------------------------------------------------------*/
-/**
- * @brief setSigInt
- */
-/*--------------------------------------------------------------*/
-void setSigInt(  )
-{
-    signal(SIGINT, ctrlC);
-}
-
+/*==============================================================*/
 class MyParam
 {
-    void init()
-    {
+    void init(){
         logName = NULL;
         streamName = NULL;
         streamId = 0;
@@ -88,8 +65,7 @@ public:
             << endl;
     }
 
-    bool optAnalyze(int aArgc, char **aArgv)
-    {
+    bool optAnalyze(int aArgc, char **aArgv){
         int opt, optIndex = 0;
         struct option longOpt[] = {
             {"log-name", 1, 0, 'l'},
@@ -100,10 +76,8 @@ public:
             {"help", 0, 0, 'h'},
             {0, 0, 0, 0}
         };
-        while( ( opt = getopt_long( aArgc, aArgv, "l:i:n:vh", longOpt, &optIndex)) != -1)
-        {
-            switch(opt)
-            {
+        while( ( opt = getopt_long( aArgc, aArgv, "l:i:n:vh", longOpt, &optIndex)) != -1){
+            switch(opt){
                 case 'l' : logName = optarg; break;
                 case 'n' : streamName = optarg; break;
                 case 'i' : streamId = atoi(optarg); break;
@@ -114,8 +88,7 @@ public:
             }
         }
 
-        if( ( !logName ) || ( !streamName ) )
-        {
+        if( ( !logName ) || ( !streamName ) ){
             cerr << "USAGE : this program need <LOGNAME> and <NAME> of stream." << endl;
             cerr << "help : " << aArgv[0] << " -h" << endl;
             return false;
@@ -127,10 +100,36 @@ public:
 
 
 
-// SSMのログ保存
 /*--------------------------------------------------------------*/
 /**
- * @brief main
+ * @brief ctrlC
+ * @param aStatus
+ */
+/*--------------------------------------------------------------*/
+void ctrlC( int aStatus )
+{
+    // exit(aStatus);
+    gShutOff = true;
+    signal( SIGINT, NULL );
+}
+
+
+
+/*--------------------------------------------------------------*/
+/**
+ * @brief setSigInt
+ */
+/*--------------------------------------------------------------*/
+void setSigInt(  )
+{
+    signal(SIGINT, ctrlC);
+}
+
+
+
+/*--------------------------------------------------------------*/
+/**
+ * @brief ssm log save
  * @param aArgc
  * @param aArgv
  * @return
@@ -148,31 +147,26 @@ int main( int aArgc, char **aArgv )
     size_t propertySize = 0;
     size_t dataSize = 0;
 
-    // オプション解析
-    if( !param.optAnalyze( aArgc, aArgv ) )
-        return -1;
+    //! option analyze
+    if( !param.optAnalyze( aArgc, aArgv ) ) return -1;
 
-    // SSMの初期化
-    if( !initSSM(  ) )
-    {
+    //! SSM initialize
+    if( !initSSM(  ) ){
         logError << "ERROR: ssm init error." << endl;
         return -1;
     }
 
     setSigInt();
 
-    // SSMに問い合わせ
+    //! connect to SSM
     ssmTimeT startTime = gettimeSSM_real(  );
-    while( getSSM_info( param.streamName, param.streamId, &dataSize, &num, &cycle, &propertySize ) <= 0 )
-    {
-        if( gShutOff )
-        {
+    while( getSSM_info( param.streamName, param.streamId, &dataSize, &num, &cycle, &propertySize ) <= 0 ){
+        if( gShutOff ){
             endSSM();
             return -1;
         }
 
-        if( gettimeSSM_real() - startTime > WAITTIME )
-        {
+        if( gettimeSSM_real() - startTime > WAITTIME ){
             logError << "ERROR: cannot get ssm info of '"<< param.streamName << " ["<<  param.streamId<< "]." << endl;
             endSSM();
             return -1;
@@ -180,9 +174,8 @@ int main( int aArgc, char **aArgv )
         usleep( 100000 );
     }
 
-    try
-    {
-        // メモリ確保
+    try{
+        //! assure memory
         if( ( data = malloc( dataSize ) ) == NULL )
             throw runtime_error("memory allocation of data");
         if( ( property = malloc( propertySize ) ) == NULL )
@@ -191,7 +184,7 @@ int main( int aArgc, char **aArgv )
         log.setBuffer( data, dataSize, property, propertySize );
         stream.setBuffer( data, dataSize, property, propertySize );
 
-        // ストリームを開く
+        //! open stream
         if( !stream.open( param.streamName, param.streamId ) )
             throw runtime_error( "stream is not exist." );
         if( propertySize > 0 && ( !stream.getProperty(  ) ) )
@@ -201,41 +194,37 @@ int main( int aArgc, char **aArgv )
         stream.readLast(  );
         stream.setBlocking( true );
 
-        // ログファイルを作成
+        //! create log file
         if( !log.create( param.streamName, param.streamId, num, cycle, param.logName ) )
             throw runtime_error( "cannot create logfile" );
 
         logVerbose << "create log '" << param.logName << "'." << endl;
 
-        // メインループ
-        while( !gShutOff )
-        {
-            // ストリームから読み込み
-            if( !stream.readNext(  ) )
-                continue;
+        //! main loop
+        while( !gShutOff ){
+            //! read from stream
+            if( !stream.readNext(  ) ) continue;
 
-            // ファイルへ書き込み
+            //! write for file
             if( !log.write( stream.time ) )
-            {
                 throw runtime_error( "cannot write log." );
-            }
         }
     }
-    catch(std::exception &exception)
-    {
+    catch(std::exception &exception){
         cerr << endl << "EXCEPTION : " << exception.what() << endl;
     }
-    catch(...)
-    {
+
+    catch(...){
         cerr << endl << "EXCEPTION : unknown exception." << endl;
     }
 
     log.close(  );
-    // SSMからの切断
+
+    //! shutout from ssm
     stream.close(  );
     endSSM(  );
 
-    // メモリの解放
+    //! release memory
     free( data );
     free( property );
 

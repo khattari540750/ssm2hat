@@ -21,7 +21,6 @@
 
 
 
-/** @brief 時刻同期用変数 */
 struct ssmtime *timecontrol = NULL;
 int shm_timeid;
 
@@ -129,7 +128,7 @@ int usleepSSM( useconds_t usec )
 /**
  * @brief timetof
  * @param t
- * @return
+ * @return time
  */
 /*--------------------------------------------------------------*/
 static double timetof( struct timeval t )
@@ -142,7 +141,7 @@ static double timetof( struct timeval t )
 /*--------------------------------------------------------------*/
 /**
  * @brief gettimeSSM_real
- * @return
+ * @return time
  */
 /*--------------------------------------------------------------*/
 ssmTimeT gettimeSSM_real( void )
@@ -151,7 +150,6 @@ ssmTimeT gettimeSSM_real( void )
 
     gettimeofday( &current, NULL );
     return timetof( current );
-
 }
 
 
@@ -183,7 +181,6 @@ int usleepSSM( useconds_t usec )
         double t, speed = timecontrol->speed;
         if(speed < 0.0)speed = -speed;
         t = (double)usec / timecontrol->speed;
-
         return usleep( (int)t );
     }
     return usleep( usec );
@@ -295,9 +292,7 @@ int settimeSSM_is_pause( int is_pause )
 /*--------------------------------------------------------------*/
 int gettimeSSM_is_pause( void )
 {
-    if(timecontrol != NULL){
-        return timecontrol->is_pause;
-    }
+    if(timecontrol != NULL) return timecontrol->is_pause;
     return 0;
 }
 
@@ -313,9 +308,9 @@ int gettimeSSM_is_pause( void )
 int settimeSSM_is_reverse( int is_reverse )
 {
     double speed = gettimeSSM_speed();
-    if( (speed  < 0.0 && !is_reverse) || ( speed >= 0.0 && is_reverse ) ){
+    if( (speed  < 0.0 && !is_reverse) || ( speed >= 0.0 && is_reverse ) )
         settimeSSM_speed( -speed );
-    }
+
     return 1;
 }
 
@@ -324,7 +319,7 @@ int settimeSSM_is_reverse( int is_reverse )
 /*--------------------------------------------------------------*/
 /**
  * @brief  gettimeSSM_is_reverse  check reverse
- * @return true:1 false:0
+ * @return speed is.. +:0 -:1
  */
 /*--------------------------------------------------------------*/
 int gettimeSSM_is_reverse( void )
@@ -340,7 +335,7 @@ int gettimeSSM_is_reverse( void )
 /*--------------------------------------------------------------*/
 /**
  * @brief  opentimeSSM
- * @return false 0 ture 1
+ * @return false:0 ture:1
  */
 /*--------------------------------------------------------------*/
 int opentimeSSM( void )
@@ -406,13 +401,13 @@ int createtimeSSM( void )
 /*--------------------------------------------------------------*/
 /**
  * @brief  destroytimeSSM
- * @return
+ * @return 1
  */
 /*--------------------------------------------------------------*/
 int destroytimeSSM( void )
 {
     closetimeSSM(  );
-    if(shm_timeid >= 0 )
-        shmctl( shm_timeid, IPC_RMID, 0 );
+    if(shm_timeid >= 0 ) shmctl( shm_timeid, IPC_RMID, 0 );
+
     return 1;
 }

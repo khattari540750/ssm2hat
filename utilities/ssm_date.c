@@ -31,10 +31,8 @@ int gIsVerbose = 1;
 int init(  )
 {
     static int isInit = 0;
-    if( !isInit )
-    {
-        if( !initSSM(  ) )
-        {
+    if( !isInit ){
+        if( !initSSM(  ) ){
             fprintf( stderr, "ERROR : cannot init ssm.\n" );
             return 0;
         }
@@ -53,8 +51,7 @@ int init(  )
 /*--------------------------------------------------------------*/
 void printParam( int opt )
 {
-    if( opt == 'A' || opt == 'a' || opt == 'd' )
-    {
+    if( opt == 'A' || opt == 'a' || opt == 'd' ){
         char day[64];
         time_t t = gettimeSSM(  );
         strftime( day, sizeof ( day ), "%Y/%m/%d(%a) %H:%M:%S %Z", localtime( &t ) );
@@ -65,8 +62,7 @@ void printParam( int opt )
     if( opt == 'A' || opt == 'a' || opt == 't' )
         printf( "%s%lf\n", ( gIsVerbose ? "SSM TIME   : " : "" ), gettimeSSM(  ) );
 
-    if( opt == 'A' || opt == 'u' )
-    {
+    if( opt == 'A' || opt == 'u' ){
         char day[64];
         time_t t = gettimeSSM_real(  );
         strftime( day, sizeof ( day ), "%Y/%m/%d(%a) %H:%M:%S %Z", localtime( &t ) );
@@ -80,15 +76,13 @@ void printParam( int opt )
     if( opt == 'A' || opt == 'a' || opt == 'x' )
         printf( "%s%lf\n", ( gIsVerbose ? "SSM SPEED  : " : "" ), gettimeSSM_speed(  ) );
 
-    if( gIsVerbose )
-    {
+    if( gIsVerbose ){
         if( opt == 'A' || opt == 'a' || opt == 'p' )
             printf( "%s%s\n", "IS_PAUSE   : ", ( gettimeSSM_is_pause(  )? "PAUSE" : "PLAY" ) );
         if( opt == 'A' || opt == 'r' )
             printf( "%s%s\n", "IS_REVERSE : ", ( gettimeSSM_is_reverse(  )? "REVERSE" : "FORWARD" ) );
     }
-    else
-    {
+    else{
         if( opt == 'A' || opt == 'a' || opt == 'p' )
             printf( "%d\n", ( gettimeSSM_is_pause(  )? 1 : 0 ) );
         if( opt == 'A' || opt == 'r' )
@@ -120,8 +114,8 @@ void printHelp( const char *name, int isLongHelp )
     fprintf( stderr, "\t-q | --quiet           : set NOT verbose.\n" );
     fprintf( stderr, "\t-h | --help            : print this help.\n" );
     fprintf( stderr, "\t-H | --long-help       : print long help.\n" );
-    if( isLongHelp )
-    {
+
+    if( isLongHelp ){
         fprintf( stderr, "\nLONG HELP\n" );
         fprintf( stderr, "\t-d | --get-date        : get ssm date.\n" );
         fprintf( stderr, "\t-t | --get-time        : get ssm time.\n" );
@@ -181,14 +175,10 @@ int main( int aArgc, char **aArgv )
         {0, 0, 0, 0}
     };
 
-    while( ( opt = getopt_long( aArgc, aArgv, "aAIdtT:uUxX:sSpP:rR:gGvqhH", longOpt, &optIndex ) ) != -1 )
-    {
-        if( opt != 'h' && opt != 'H' && !init(  ) )
-        {
-            return 1;
-        }
-        switch ( opt )
-        {
+    while( ( opt = getopt_long( aArgc, aArgv, "aAIdtT:uUxX:sSpP:rR:gGvqhH", longOpt, &optIndex ) ) != -1 ){
+        if( opt != 'h' && opt != 'H' && !init(  ) ) return 1;
+
+        switch ( opt ){
         case 'a':
         case 'A':
         case 'd':
@@ -260,8 +250,7 @@ int main( int aArgc, char **aArgv )
             break;
         case 0:
             {
-                switch ( optFlag )
-                {
+                switch ( optFlag ){
                 case 's':
                     sleepSSM( atof( optarg ) );
                     break;
@@ -282,10 +271,8 @@ int main( int aArgc, char **aArgv )
         }
     }
 
-    if( aArgc == 1 && init(  ) )
-    {
-        printParam( 'a' );
-    }
+    if( aArgc == 1 && init(  ) ) printParam( 'a' );
+
 
     endSSM(  );
 

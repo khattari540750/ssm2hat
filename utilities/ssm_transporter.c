@@ -1,7 +1,7 @@
 /****************************************************************/
 /**
-  @file   libssm2hat_shm.c
-  @brief  ssm2hat library shm
+  @file   ssm_transporter.c
+  @brief  ssm using network
   @author HATTORI Kohei <hattori[at]team-lab.com>
  */
 /****************************************************************/
@@ -26,10 +26,8 @@
 #include <pthread.h>
 #include <signal.h>
 
-
 #include "ssm2hat.h"
 #include "ssm2hat_time.h"
-//#include "ssm_transporter.h"
 
 
 
@@ -71,9 +69,6 @@ typedef struct _reg_sensor {
 #define SSMT_DATA 1
 #define SSMT_PROPERTY 2
 
-
-
-
 int sockfd, infd;
 struct sockaddr_in srv;
 #define SERVER_MODE 0
@@ -95,7 +90,7 @@ int gShutOff = 0;
 /*--------------------------------------------------------------*/
 void ctrlC( int aStatus )
 {
-    // exit(aStatus); // デストラクタが呼ばれないのでダメ
+    // exit(aStatus);
     gShutOff = 1;
     signal( SIGINT, NULL );
 }
@@ -113,10 +108,10 @@ void setSigInt(  )
 }
 
 
-/* サーバ側オープン */
+
 /*--------------------------------------------------------------*/
 /**
- * @brief open_tcpip
+ * @brief open_tcpip server open function
  * @param port_num
  * @return
  */
@@ -125,27 +120,29 @@ int open_tcpip( int port_num )
 {
     socklen_t socklen;
 
-    if( ( sockfd = socket( PF_INET, SOCK_STREAM, 0 ) ) < 0 )
-    {
+    //! socket open
+    if( ( sockfd = socket( PF_INET, SOCK_STREAM, 0 ) ) < 0 ){
         printf( "ERROR: socket error.\n" );
         return 0;
     }
+
+    //! set senging data
     memset( &srv, 0, sizeof ( srv ) );
     srv.sin_family = AF_INET;
     srv.sin_port = htons( port_num );
-
     socklen = sizeof ( srv );
-    if( ( bind( sockfd, ( struct sockaddr * )&srv, socklen ) ) < 0 )
-    {
+
+    //! bind & listen
+    if( ( bind( sockfd, ( struct sockaddr * )&srv, socklen ) ) < 0 ){
         printf( "binding..." );
         return 0;
     }
-    if( listen( sockfd, 5 ) < 0 )
-    {
+    if( listen( sockfd, 5 ) < 0 ){
         printf( "listening..." );
         return 0;
     }
-    /* connect */
+
+    //! connect
     puts( "TCP/IP socket available" );
     printf( "\tport %d\n", ntohs( srv.sin_port ) );
     printf( "\taddr %s\n", inet_ntoa( srv.sin_addr ) );
@@ -154,21 +151,29 @@ int open_tcpip( int port_num )
     return 1;
 }
 
+
+
+/*--------------------------------------------------------------*/
+/**
+ * @brief open_tcpip_cli
+ * @param ip_address
+ * @param port_num
+ * @return
+ */
+/*--------------------------------------------------------------*/
 int open_tcpip_cli( char *ip_address, int port_num )
 {
     socklen_t socklen;
     struct sockaddr_in cli;
 
-    if( ( infd = socket( PF_INET, SOCK_STREAM, 0 ) ) < 0 )
-    {
+    if( ( infd = socket( PF_INET, SOCK_STREAM, 0 ) ) < 0 ){
         printf( "socket\n" );
         return 0;
     }
     memset( &cli, 0, sizeof ( cli ) );
     cli.sin_family = AF_INET;
     cli.sin_port = htons( port_num );
-    if( !( inet_aton( ip_address, &cli.sin_addr ) ) )
-    {
+    if( !( inet_aton( ip_address, &cli.sin_addr ) ) ){
         printf( "inet_aton\n" );
         return 0;
     }
@@ -178,7 +183,8 @@ int open_tcpip_cli( char *ip_address, int port_num )
         printf( "ERROR: connect error.\n" );
         return 0;
     }
-    /* connect */
+
+    //! connect
     puts( "connected to TCP/IP socket" );
     printf( "\tport %d\n", ntohs( cli.sin_port ) );
     printf( "\taddr %s\n", inet_ntoa( cli.sin_addr ) );
@@ -187,7 +193,6 @@ int open_tcpip_cli( char *ip_address, int port_num )
 
 
 
-/* 新しいセンサを登録する */
 /*--------------------------------------------------------------*/
 /**
  * @brief regist_new_sensor
@@ -200,9 +205,13 @@ int open_tcpip_cli( char *ip_address, int port_num )
 int regist_new_sensor( SSMT_newsensor * new_sensor, RegSensPtr sensor, int num )
 {
     sprintf( sensor->name, "%s", new_sensor->name );
-    if( ( sensor->sid = createSSM_time( new_sensor->name, new_sensor->suid, new_sensor->size, new_sensor->time, new_sensor->cycle ) ) <= 0 )
-    {
-        printf( "ERROR: Sensor %s[%d] registration failed\n", new_sensor->name, new_sensor->suid );
+    if( ( sensor->sid = createSSM_time( new_sensor->name,
+                                        new_sensor->suid,
+                                        new_sensor->size,
+                                        new_sensor->time,
+                                        new_sensor->cycle ) ) <= 0 ){
+        printf( "ERROR: Sensor %s[%d] registration failed\n",
+                new_sensor->name, new_sensor->suid );
         return 0;
     }
     sensor->size = new_sensor->size;
@@ -211,12 +220,11 @@ int regist_new_sensor( SSMT_newsensor * new_sensor, RegSensPtr sensor, int num )
     sensor->data = malloc( new_sensor->size );
     if( new_sensor->property_size )
         sensor->property = malloc( new_sensor->property_size );
-    else
-        sensor->property = 0;
+    else sensor->property = 0;
     sensor->id = num;
-    if( !sensor->data )
-    {
-        printf( "ERROR: Sensor %s[%d] having no data\n", new_sensor->name, new_sensor->suid );
+    if( !sensor->data ){
+        printf( "ERROR: Sensor %s[%d] having no data\n",
+                new_sensor->name, new_sensor->suid );
         return 0;
     }
     return 1;
@@ -224,10 +232,9 @@ int regist_new_sensor( SSMT_newsensor * new_sensor, RegSensPtr sensor, int num )
 
 
 
-/* TCP/IPで送信 */
 /*--------------------------------------------------------------*/
 /**
- * @brief send_sensor_data
+ * @brief send_sensor_data sending at TCP/IP
  * @param sensor
  * @return
  */
@@ -237,7 +244,7 @@ int send_sensor_data( RegSensPtr sensor )
     int rp, size;
     SSMT_header header;
 
-    /* ヘッダ送信 */
+    //! sending header
     header.head = SSMT_HEAD;
     header.type = SSMT_DATA;
     header.id = sensor->id;
@@ -245,16 +252,16 @@ int send_sensor_data( RegSensPtr sensor )
     header.time = sensor->time;
     write( infd, &header, sizeof ( SSMT_header ) );
 
-    /* データ送信 */
+    //! sending data
     rp = 0;
-    while( rp < sensor->size )
-    {
+    while( rp < sensor->size ){
         size = 1000;
         if( size > sensor->size - rp )
             size = sensor->size - rp;
         rp += write( infd, sensor->data + rp, size );
         // printf(">");
     }
+
     return 1;
 }
 
@@ -283,16 +290,13 @@ int send_newsensor( RegSensPtr sensor, char *name, int suid )
     sprintf( new_sensor.name, "%s", name );
     new_sensor.suid = suid;
 
-    if( ( sensor->sid = openSSM( name, suid, 0 ) ) <= 0 )
-    {
+    if( ( sensor->sid = openSSM( name, suid, 0 ) ) <= 0 ){
         printf( "WARNING: Sensor %s[%d] is not found, wating for it!\n", name, suid );
-        while( ( ( sensor->sid = openSSM( name, suid, 0 ) ) <= 0 ) && ( timeoutCnt <= DRIVER_WAIT_TIMEOUT ) )
-        {
+        while( ( ( sensor->sid = openSSM( name, suid, 0 ) ) <= 0 ) && ( timeoutCnt <= DRIVER_WAIT_TIMEOUT ) ){
             usleep( 1000 );
             timeoutCnt += 0.001;
         }
-        if( timeoutCnt >= DRIVER_WAIT_TIMEOUT )
-        {
+        if( timeoutCnt >= DRIVER_WAIT_TIMEOUT ){
             printf( "ERROR: Sensor %s[%d] is not found and timeout reached\n", name, suid );
             return 0;
         }
@@ -304,16 +308,16 @@ int send_newsensor( RegSensPtr sensor, char *name, int suid )
         return 0;
     new_sensor.time = ( double )num *new_sensor.cycle;
 
-    /* ヘッダ送信 */
+    //! sending header
     header.head = SSMT_HEAD;
     header.type = SSMT_NEW;
     header.id = 0;
     header.size = sizeof ( SSMT_newsensor );
     write( infd, &header, sizeof ( SSMT_header ) );
     write( infd, &new_sensor, sizeof ( SSMT_newsensor ) );
-    /* プロパティ送信 */
-    if( new_sensor.property_size > 0 )
-    {
+
+    //! sending property
+    if( new_sensor.property_size > 0 ){
         sensor->property = malloc( new_sensor.property_size );
         printf( "get property\n" );
         get_propertySSM( name, suid, ( char * )sensor->property );
@@ -324,10 +328,8 @@ int send_newsensor( RegSensPtr sensor, char *name, int suid )
         write( infd, &header, sizeof ( SSMT_header ) );
         write( infd, ( char * )sensor->property, new_sensor.property_size );
     }
-    else
-    {
-        sensor->property = 0;
-    }
+    else sensor->property = 0;
+
     sensor->id = id;
     sensor->suid = new_sensor.suid;
     sensor->size = new_sensor.size;
@@ -342,10 +344,9 @@ int send_newsensor( RegSensPtr sensor, char *name, int suid )
 
 
 
-/* 新しいデータがあったら送信する */
 /*--------------------------------------------------------------*/
 /**
- * @brief ssm2tcp
+ * @brief ssm2tcp sending when theare is new data
  * @param filename
  * @return
  */
@@ -361,18 +362,14 @@ int ssm2tcp( char *filename )
 
     /* センサの登録処理 */
     send_file = fopen( filename, "r" );
-    if( !send_file )
-    {
+    if( !send_file ){
         printf( "File [%s] does not exist. No driver data will be sent\n", filename );
         // return 0;
     }
-    else
-    {
+    else{
         printf( "File [%s] does exist.\n", filename );
-        while( fscanf( send_file, "%s %d", name, &suid ) != EOF )
-        {
-            if( send_newsensor( &out_sensor[out_sensor_num], name, suid ) )
-            {
+        while( fscanf( send_file, "%s %d", name, &suid ) != EOF ){
+            if( send_newsensor( &out_sensor[out_sensor_num], name, suid ) ){
                 printf( "Sensor %s[%d] sent.\n", out_sensor[out_sensor_num].name, out_sensor[out_sensor_num].suid );
                 out_sensor_num++;
             }
@@ -380,28 +377,24 @@ int ssm2tcp( char *filename )
         fclose( send_file );
     }
     /* センサデータの送信処理 */
-    while( !gShutOff )
-    {
+    while( !gShutOff ){
         updated = 0;
-        for ( i = 0; i < out_sensor_num; i++ )
-        {
-            if( readSSM( out_sensor[i].sid, out_sensor[i].data, &out_sensor[i].time, out_sensor[i].tid ) > 0 )
-            {
+        for ( i = 0; i < out_sensor_num; i++ ){
+            if( readSSM( out_sensor[i].sid, out_sensor[i].data, &out_sensor[i].time, out_sensor[i].tid ) > 0 ){
                 out_sensor[i].tid++;
                 send_sensor_data( &out_sensor[i] );	/* 送信する */
                 updated = 1;
             }
         }
-        if( !updated )
-            usleep( 10000 );
+        if( !updated ) usleep( 10000 );
     }
 }
 
 
-/* TCP/IPのメッセージを解釈して、SSMに入力する */
+
 /*--------------------------------------------------------------*/
 /**
- * @brief tcp2ssm
+ * @brief tcp2ssm get TCP/IP message and enter the SSM
  */
 /*--------------------------------------------------------------*/
 void tcp2ssm( void )
@@ -412,22 +405,21 @@ void tcp2ssm( void )
     SSMT_header header;
     SSMT_newsensor new_sensor;
 
-    while( !gShutOff )
-    {
-        /* ヘッダ読み込み */
+    while( !gShutOff ){
+        //! header read
         len = 0;
         while( len < sizeof ( SSMT_header ) )
-            len += read( infd, ( ( char * )&header ) + len, sizeof ( SSMT_header ) - len );
-        /* header check */
-        if( header.head != SSMT_HEAD )
-        {
+            len += read( infd, ( ( char * )&header )
+                         + len, sizeof ( SSMT_header ) - len );
+
+        //! header check
+        if( header.head != SSMT_HEAD ){
             printf( "ERROR: header error.\n" );
             return;
         }
 
         /* それぞれのタイプに応じて読み込み */
-        switch ( header.type )
-        {
+        switch ( header.type ){
         case SSMT_NEW:
             len = 0;
             while( len < sizeof ( SSMT_newsensor ) )
@@ -471,7 +463,7 @@ int main( int argc, char *argv[] )
 {
     pthread_t receive_thread;
 
-    /* initialize */
+    //! initialize
     pthread_mutex_init( &mutex, NULL );
 
     if( !initSSM(  ) )
@@ -479,21 +471,19 @@ int main( int argc, char *argv[] )
 
     setSigInt();
 
-    if( argc > 1 )
-    {
+    if( argc > 1 ){
         mode = CLIENT_MODE;
         printf( "client\n" );
         open_tcpip_cli( argv[1], 50000 );
     }
-    else
-    {
+    else{
         mode = SERVER_MODE;
         printf( "server\n" );
         open_tcpip( 50000 );
     }
-    if( pthread_create( &receive_thread, NULL, ( void * )tcp2ssm, NULL ) != 0 )
-    {
-        /* エラー処理 */
+    if( pthread_create( &receive_thread,
+                        NULL, ( void * )tcp2ssm, NULL ) != 0 ){
+        /* error function */
     }
 
     if( mode == CLIENT_MODE )

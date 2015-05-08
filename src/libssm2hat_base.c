@@ -1,6 +1,6 @@
 /****************************************************************/
 /**
-  @file   libssm2hat.c
+  @file   libssm2hat_base.c
   @brief  ssm2hat library time
   @author HATTORI Kohei <hattori[at]team-lab.com>
  */
@@ -32,7 +32,7 @@ int shm_id = -1;			//! Shared memory ID
 char *shm_ptr;				//! Shared memory top address
 int msq_id = -1;			//! Message queue ID
 pid_t my_pid;				//! Own process ID
-char err_msg[20];
+char err_msg[20];           //! Error message
 
 
 
@@ -79,7 +79,6 @@ SSM_tid getTID_top( SSM_sid sid )
 {
     if( sid == 0 )
         return SSM_ERROR_NO_DATA;
-    //! return tid
     return shm_get_tid_top( shm_get_address( sid ) );
 }
 
@@ -94,7 +93,8 @@ SSM_tid getTID_top( SSM_sid sid )
 /*--------------------------------------------------------------*/
 SSM_tid getTID_bottom( SSM_sid sid )
 {
-    if( sid == 0 ) { return SSM_ERROR_NO_DATA; }
+    if( sid == 0 )
+        return SSM_ERROR_NO_DATA;
     return shm_get_tid_bottom( shm_get_address( sid ) );
 }
 
@@ -110,7 +110,8 @@ SSM_tid getTID_bottom( SSM_sid sid )
 /*--------------------------------------------------------------*/
 int waitTID( SSM_sid sid, SSM_tid tid )
 {
-    if( sid == 0 ) { return -1; }
+    if( sid == 0 )
+        return -1;
     return shm_cond_wait( shm_get_address( sid ), tid );
 }
 

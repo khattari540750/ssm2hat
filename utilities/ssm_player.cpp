@@ -45,7 +45,7 @@ bool gShutOff = false;
 /*--------------------------------------------------------------*/
 void ctrlC( int aStatus )
 {
-    // exit(aStatus); // デストラクタが呼ばれないのでダメ
+    // exit(aStatus);
     gShutOff = true;
     signal( SIGINT, NULL );
 }
@@ -78,21 +78,24 @@ int getUnit( double *data, char *unit )
     static const char table[] = { " kMGTPEZY" };
     static const double base = 1024;
 
-    while( *data >= base && i < 8 )
-    {
+    while( *data >= base && i < 8 ){
         *data /= base;
         i++;
     }
-    if( i < 0 || i > 8 )
-        i = 0;
+    if( i < 0 || i > 8 ) i = 0;
     *unit = table[i];
 
-    if( i > 0 )
-        return 1;
+    if( i > 0 ) return 1;
     return 0;
 }
 
 
+
+/*==============================================================*/
+/**
+ * @brief The LogPlayer class
+ */
+/*==============================================================*/
 class LogPlayer
 {
     const char *logName;
@@ -103,10 +106,11 @@ class LogPlayer
     SSMApiBase stream;
     SSMLogBase log;
 
-    int readCnt;// 読み込んだ回数
-    int writeCnt; // 書きこんだ回数
+    int readCnt;  //! read counter
+    int writeCnt; //! wirte counter
 
     bool mIsPlaying;
+
     void init(  )
     {
         data = NULL;
@@ -119,7 +123,6 @@ class LogPlayer
     }
 
 public:
-    // 再生中かどうか
     bool isPlaying(  )
     {
         return mIsPlaying;
@@ -154,7 +157,6 @@ public:
         property = NULL;
     }
 
-    // openしたら必ずcloseすること！
     bool open(  )
     {
         logVerbose << "open : " << logName << endl;
@@ -165,8 +167,7 @@ public:
         data = malloc( dataSize );
         property = malloc( propertySize );
 
-        if( ( data == NULL ) || ( propertySize && property == NULL ))
-        {
+        if( ( data == NULL ) || ( propertySize && property == NULL )){
             log.close();
             free( data );
             free( property );
@@ -185,40 +186,32 @@ public:
         if( !stream.create( log.getStreamName(), log.getStreamId(), saveTime, log.getCycle() ) )
             return false;
 
-        if( propertySize && !stream.setProperty() )
-            return false;
+        if( propertySize && !stream.setProperty() ) return false;
         return true;
     }
 
-    // デストラクタへの登録禁止
     void close(  )
     {
         stream.release(  );
         log.close(  );
     }
+
     bool seek( ssmTimeT time )
     {
-        // logからの読み込み
-        if( !log.readTime( time ) )
-            return false;
-        // log時間でのstreamへの書き込み
-        if( !stream.write( log.time() ) )
-            return false;
+        //! read log
+        if( !log.readTime( time ) ) return false;
+        if( !stream.write( log.time() ) ) return false;
         writeCnt = ++readCnt;
         return true;
     }
 
     bool play( ssmTimeT time = gettimeSSM(  ) )
     {
-        if( readCnt == writeCnt )
-        {
-            if( ( mIsPlaying = log.readNext(  ) )  )
-                readCnt++;
+        if( readCnt == writeCnt ){
+            if( ( mIsPlaying = log.readNext(  ) )  ) readCnt++;
         }
 
-        if( log.time(  ) <= time && writeCnt < readCnt )
-        {
-            // log時間でのstreamへの書き込み
+        if( log.time(  ) <= time && writeCnt < readCnt ){
             stream.write( log.time(  ) );
             writeCnt = readCnt;
             return true;
@@ -228,20 +221,15 @@ public:
 
     bool playBack( ssmTimeT time = gettimeSSM(  ) )
     {
-        if( readCnt == writeCnt )
-        {
-            if( ( mIsPlaying = log.readBack(  ) )  )
-                readCnt++;
+        if( readCnt == writeCnt ){
+            if( ( mIsPlaying = log.readBack(  ) )  ) readCnt++;
         }
 
-        if( log.time(  ) >= time && writeCnt < readCnt )
-        {
-            // log時間でのstreamへの書き込み
+        if( log.time(  ) >= time && writeCnt < readCnt ){
             stream.write( log.time(  ) );
             writeCnt = readCnt;
             return true;
         }
-
         return false;
     }
 
@@ -251,7 +239,10 @@ public:
     }
 };
 
+
+
 typedef std::list<LogPlayer> LogPlayerArray;
+
 
 
 class MyParam
@@ -307,10 +298,8 @@ public:
             {"help", 0, 0, 'h'},
             {0, 0, 0, 0}
         };
-        while( ( opt = getopt_long( aArgc, aArgv, "x:s:lS:e:E:vqh", longOpt, &optIndex)) != -1)
-        {
-            switch(opt)
-            {
+        while( ( opt = getopt_long( aArgc, aArgv, "x:s:lS:e:E:vqh", longOpt, &optIndex)) != -1){
+            switch(opt){
                 case 'x' : speed = atof( optarg ); break;
                 case 's' : startOffsetTime = atof(optarg); break;
                 case 'e' : endOffsetTime = atof(optarg); break;
@@ -324,14 +313,12 @@ public:
             }
         }
 
-        // 残りは全部ログファイル
-        for( ; optind < aArgc; optind++ )
-        {
+        //! remainder is all log file
+        for( ; optind < aArgc; optind++ ){
             logArray.push_back( LogPlayer( aArgv[optind] ) );
         }
 
-        if( !logArray.size() )
-        {
+        if( !logArray.size() ){
             logError << "USAGE : this program needs <LOGFILE> of ssm." << endl;
             logError << "help : " << aArgv[0] << " -h" << endl;
             return false;
@@ -344,17 +331,13 @@ public:
         LogPlayerArray::iterator log;
         ssmTimeT time = INFINITY;
 
-        // 設定中は一時停止
-        settimeSSM_is_pause( 1 );
-        // 設定
-        settimeSSM_speed( speed );
+        settimeSSM_is_pause( 1 ); //! pose during setting
+        settimeSSM_speed( speed ); //! setting
 
-        // ログファイルの展開とストリームの作成
+        //! deployment logfile and create stream
         log = logArray.begin(  );
-        while( log != logArray.end(  ) )
-        {
-            if( !log->open(  ) )
-            {
+        while( log != logArray.end(  ) ){
+            if( !log->open(  ) ){
                 log = logArray.erase( log );
                 continue;
             }
@@ -363,29 +346,21 @@ public:
             log++;
         }
 
-        // ssm時間の設定
-        if( startTime > 0 || startOffsetTime > 0 )
-        {
-            if( startTime <= 0 )
-                startTime = time;
+        //! ssm time setting
+        if( startTime > 0 || startOffsetTime > 0 ){
+            if( startTime <= 0 ) startTime = time;
             startTime += startOffsetTime;
-
-            // シーク
             seek( startTime );
         }
-        else
-        {
+        else{
             startTime = time;
         }
 
-        if( endTime > 0 || endOffsetTime > 0 )
-        {
-            if( endTime <= 0 )
-                endTime = time;
+        if( endTime > 0 || endOffsetTime > 0 ){
+            if( endTime <= 0 ) endTime = time;
             endTime += endOffsetTime;
         }
-        else
-        {
+        else{
             endTime = INFINITY;
         }
 
@@ -396,15 +371,16 @@ public:
 
         return true;
     }
+
     bool seek( ssmTimeT time )
     {
         int isPause = gettimeSSM_is_pause();
         settimeSSM_is_pause( 1 );
         LogPlayerArray::iterator log;
-        // シーク
+
+        //! seek
         log = logArray.begin(  );
-        while( log != logArray.end(  ) )
-        {
+        while( log != logArray.end(  ) ){
             log->seek( time );
             log++;
         }
@@ -415,23 +391,20 @@ public:
 
     bool printProgressInit()
     {
-        for( int i=0; i< 5; i++ )
-        {
-            logInfo << endl;
-        }
+        for( int i=0; i< 5; i++ ) logInfo << endl;
+
         return true;
     }
+
     bool printProgress( ssmTimeT time )
     {
         char unit;
         double total = 0;
-
         char day[64];
         time_t t = time;
-        strftime( day, sizeof ( day ), "%Y/%m/%d(%a) %H:%M:%S %Z", localtime( &t ) );
-
         LogPlayerArray::iterator log;
 
+        strftime( day, sizeof ( day ), "%Y/%m/%d(%a) %H:%M:%S %Z", localtime( &t ) );
         getUnit( &total, &unit );
 
         logInfo
@@ -523,10 +496,9 @@ public:
 
 
 
-// SSMのログ再生
 /*--------------------------------------------------------------*/
 /**
- * @brief main
+ * @brief main ssm log player
  * @param aArgc
  * @param aArgv
  * @return
@@ -537,29 +509,29 @@ int main( int aArgc, char **aArgv )
     MyParam param;
     LogPlayerArray::iterator log;
     char command[128];
-    try
-    {
+    ssmTimeT time, printTime;
+    bool isWorking;
+    int playCnt; //! number of log until playing
+
+    try{
         std::cout.setf(std::ios::fixed);
         std::cout << setprecision(3);
 
-        // キーボートをノンブロッキングにしてみる
+        //! keyboard nonblocking
         fcntl( fileno( stdin ), F_SETFL, O_NONBLOCK );
 
+        //! option analyze
+        if( !param.optAnalyze( aArgc, aArgv ) ) return -1;
 
-        // オプション解析
-        if( !param.optAnalyze( aArgc, aArgv ) )
-            return -1;
-
-        // SSMの初期化
-        if( !initSSM(  ) )
-        {
+        //! SSM initialize
+        if( !initSSM(  ) ){
             logError << "ssm init error." << endl;
             return -1;
         }
 
         setSigInt();
 
-        // ログファイルの展開とストリームの作成
+        //! logfile and create stream
         log = param.logArray.begin(  );
 
         param.logOpen();
@@ -567,49 +539,43 @@ int main( int aArgc, char **aArgv )
 
         logInfo << "  start" << endl << endl;
         logInfo << "\033[1A" << "> " << flush;
-        // メインループ
-        ssmTimeT time, printTime;
-        bool isWorking;
-        int playCnt; // 再生中のログの個数
+
+        //! main loop
         printTime = gettimeSSM_real(  );
         while( !gShutOff )
         {
             isWorking = false;
             playCnt = 0;
-            // 現在時刻の取得
+
+            //! get now time
             time = gettimeSSM(  );
 
-            // ログの再生
+            //! play log
             log = param.logArray.begin(  );
-            while( log != param.logArray.end(  ) )
-            {
+            while( log != param.logArray.end(  ) ){
                 isWorking |= ( gettimeSSM_speed(  ) >= 0 ? log->play( time ) : log->playBack( time ) );
-                if( log->isPlaying(  ) )
-                    playCnt++;
+                if( log->isPlaying(  ) ) playCnt++;
                 log++;
             }
             // 終了判定
             if( !playCnt || time > param.endTime )
             {
                 // ループするかどうか
-                if( param.isLoop )
-                {
+                if( param.isLoop ){
                     param.seek( param.startTime );
                 }
-                else
-                {
+                else{
                     gShutOff = true;
                     break;
                 }
             }
-            // ステータスの表示
-            if( gettimeSSM_real(  ) >= printTime )
-            {
+            // status display
+            if( gettimeSSM_real(  ) >= printTime ){
                 printTime += 1.0;
                 param.printProgress( time );
             }
 
-            // コマンド解析
+            //! command analyize
             {
                 // cinがノンブロッキングできないのでしょうがなくstdinを使うことにする。
                 // 時間があればマルチスレッドとかにしても良いけど、同期が面倒
@@ -617,31 +583,28 @@ int main( int aArgc, char **aArgv )
                     param.commandAnalyze( command );
 
             }
-            // wait
-            if( !isWorking )
-                usleepSSM( 1000 ); // 1msスリープ
+            //! wait
+            if( !isWorking ) usleepSSM( 1000 ); // 1ms sleep
         }
     }
-    catch(std::exception &exception)
-    {
+    catch(std::exception &exception){
         cerr << endl << "EXCEPTION : " << exception.what() << endl;
     }
-    catch(...)
-    {
+    catch(...){
         cerr << endl << "EXCEPTION : unknown exception." << endl;
     }
 
     logInfo << endl;
-    //　ログを閉じる
+
+    //! close log
     logInfo << "finalize log data" << endl;
     log = param.logArray.begin(  );
-    while( log != param.logArray.end(  ) )
-    {
+    while( log != param.logArray.end(  ) ){
         log->close(  );
         log++;
     }
 
-    // 時間の初期化
+    //! time initialize
     logInfo << "ssm time init" << endl;
     inittimeSSM(  );
 
