@@ -388,6 +388,8 @@ int ssm2tcp( char *filename )
         }
         if( !updated ) usleep( 10000 );
     }
+
+    return 1;
 }
 
 
@@ -418,7 +420,7 @@ void tcp2ssm( void )
             return;
         }
 
-        /* それぞれのタイプに応じて読み込み */
+        //! read type
         switch ( header.type ){
         case SSMT_NEW:
             len = 0;
