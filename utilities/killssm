@@ -43,7 +43,17 @@ do
 	fi
 done
 
-# last shutdown ssm_coordinator
+# shutdown ssm_coordinator
 echo "kill ssm_coordinator..."
-sleep 1
+sleep 0.5
 killall -SIGINT ${SSM_NAME} > /dev/null 2>&1
+
+# last shutdown all process
+echo "kill all ssm process again..."
+for i in ${PID}
+do
+	vmmap $i | grep libssm
+	if [ $? -eq 0 ]; then
+		kill -SIGINT $i 
+	fi
+done
