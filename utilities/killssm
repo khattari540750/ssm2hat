@@ -24,14 +24,18 @@
 
 
 ################# OSX script #################
-SSM_NAME='ssm_coordinator'
-COORDINATOR_ID=`pgrep ${SSM_NAME}`
-PROCESS=`ps | awk '{print $1}'`
 
-#sending all process to signal "SIGINT"
-for i in ${PROCESS}
+# define variable
+SSM_NAME='ssm_coordinator'
+COORDINATOR_PID=`pgrep ${SSM_NAME}`
+PID=`ps | awk 'NR>1' | awk '{print $1}'`
+
+# sending all process to signal "SIGINT"
+# excluding coordinator
+echo "kill ssm process..."
+for i in ${PID}
 do
-	if [ $i != ${COORDINATOR_ID} ]; then
+	if [ $i != ${COORDINATOR_PID} ]; then
 		vmmap $i | grep libssm
 		if [ $? -eq 0 ]; then
 			kill -SIGINT $i 
@@ -40,5 +44,6 @@ do
 done
 
 # last shutdown ssm_coordinator
+echo "kill ssm_coordinator..."
 sleep 1
-killall -SIGINT ${SSM_NAME} 
+killall -SIGINT ${SSM_NAME} > /dev/null 2>&1
