@@ -1,20 +1,20 @@
-libssm2hat
+ssm2hat
 ===========
-ssm
+ssm for c++ cmake installer
 
 
-動作環境
---------
+Operating environment
+---------------------
 -  OSX
 -  Linux
 
 
-ビルド・インストール方法
+Build Install
 ----------------------
- このプロジェクトは、以下の手順にて、cmake を利用してビルド、インストールします。
- あらかじめ cmake をインストールしておいてください。
+ Build and install this project using cmake in the following procedure.
+ Please install cmake in advance.
 
-    $ git clone http://gitbucket.team-lab.local/git/hattori/libscip2hat.git
+    $ git clone https://github.com/khattari540750/ssm2hat.git
     $ cd libscip2hat
     $ mkdir build
     $ cd build
@@ -23,5 +23,5 @@ ssm
     $ sudo make install
 
 
-使い方
-------
+How to use
+----------
